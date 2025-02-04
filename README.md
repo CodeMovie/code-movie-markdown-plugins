@@ -36,7 +36,7 @@ code:
 
 You can install the library as `@codemovie/code-movie-marked-plugin` from NPM,
 [download the latest release from GitHub](https://github.com/CodeMovie/code-movie-marked-plugin/releases)
-or just grab index.js` [from the source code](https://github.com/CodeMovie/code-movie-marked-plugin/tree/main/dist).
+or just grab `index.js` [from the source code](https://github.com/CodeMovie/code-movie-marked-plugin/tree/main/dist).
 
 ## Setup
 
