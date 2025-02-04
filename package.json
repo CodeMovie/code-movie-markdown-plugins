@@ -11,6 +11,7 @@
     "build": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.js",
     "dev": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --watch",
     "test": "node --test",
+    "prepareRelease": "npm run lint && npm run test && npm run build",
     "release": "release-it"
   },
   "author": "peter@peterkroener.de",
@@ -27,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CodeMovie/code-movie-reveal-plugin.git"
+    "url": "git+https://github.com/CodeMovie/code-movie-marked-plugin.git"
   },
   "bugs": {
-    "url": "https://github.com/CodeMovie/code-movie-reveal-plugin/issues"
+    "url": "https://github.com/CodeMovie/code-movie-marked-plugin/issues"
   },
-  "homepage": "https://github.com/CodeMovie/code-movie-reveal-plugin#readme",
+  "homepage": "https://github.com/CodeMovie/code-movie-marked-plugin#readme",
   "publishConfig": {
     "access": "public"
   },
