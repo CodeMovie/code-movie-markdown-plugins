@@ -28,7 +28,9 @@ wrapper syntax for fenced code blocks:
     ````
 
 With just a little configuration this turns into animated, syntax highlighted
-code!
+code:
+
+![animated code sample](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo.gif)
 
 ## Installation
 
