@@ -1,0 +1,42 @@
+{
+  "name": "@codemovie/code-movie-marked-plugin",
+  "version": "0.0.0",
+  "description": "Code.Movie plugin for Marked",
+  "main": "dist/index.js",
+  "browser": "dist/index.js",
+  "module": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ./src ./test",
+    "build": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.js",
+    "dev": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --watch",
+    "test": "node --test",
+    "release": "release-it"
+  },
+  "author": "peter@peterkroener.de",
+  "license": "MIT",
+  "peerDependencies": {
+    "marked": "^15.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.00",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.3.0",
+    "release-it": "^17.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeMovie/code-movie-reveal-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CodeMovie/code-movie-reveal-plugin/issues"
+  },
+  "homepage": "https://github.com/CodeMovie/code-movie-reveal-plugin#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "volta": {
+    "node": "23.7.0"
+  }
+}
