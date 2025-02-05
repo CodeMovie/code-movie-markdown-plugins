@@ -11,6 +11,7 @@
     "build": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.js",
     "dev": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --watch",
     "test": "node --test",
+    "demo": "npm run build && npx serve",
     "prepareRelease": "npm run lint && npm run test && npm run build",
     "release": "release-it"
   },
