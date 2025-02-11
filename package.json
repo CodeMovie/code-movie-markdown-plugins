@@ -8,10 +8,10 @@
   "type": "module",
   "scripts": {
     "lint": "eslint ./src ./test",
-    "build": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.js",
-    "dev": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --watch",
+    "build": "esbuild src/index.js --bundle --metafile=meta.json --minify --format=esm --outfile=dist/index.js",
+    "dev": "esbuild src/index.js --bundle --metafile=meta.json --format=esm --outfile=dist/index.js --watch",
     "test": "node --test",
-    "demo": "npm run build && npx serve",
+    "demo": "npm install && npm run build && npx serve",
     "prepareRelease": "npm run lint && npm run test && npm run build",
     "release": "release-it"
   },
@@ -40,5 +40,8 @@
   },
   "volta": {
     "node": "23.7.0"
+  },
+  "dependencies": {
+    "json5": "^2.2.3"
   }
 }

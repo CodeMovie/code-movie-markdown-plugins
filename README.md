@@ -3,7 +3,6 @@
 Author animated code examples with markdown! This plugin extends markdown with a
 wrapper syntax for fenced code blocks:
 
-<!-- prettier-ignore -->
     ````code-movie|json
 
     ```
@@ -67,13 +66,23 @@ import "https://cdn.jsdelivr.net/npm/@codemovie/code-movie-runtime";
 // Set the options for the plugin
 const codeMoviePlugin = markedCodeMoviePlugin({
   // Because the core library is not bundled with the plugin, you need to
-  // provide an adapter function. The adapter function is called with frame
-  // objects and the appropriate language module, which you can pass on to
-  // your particular version of the core library. If you want to tweak the tab
-  // size, theme, or run some side effects, this is the place to do that. You
-  // can also add extra HTML before, after, or around the output.
-  adapter: (frames, language) =>
-    animateHTML(frames, { tabSize: 2, language, theme: monokaiDark }),
+  // provide an adapter function. The adapter function is called with the array
+  // of frame objects, the relevant language object, and the Marked token for
+  // the animation. You can pass the first two arguments on to your particular
+  // version of the core library. The token might be interesting if you want to
+  // run `animateHTML()` with different arguments depending on metadata present
+  // in the token. If you want to tweak the tab size, theme, or run some side
+  // effects (maybe depending on the aforementioned metadata), this is the place
+  // to do that. You can also add extra HTML before, after, or around the
+  // output... or not call `animateHTML()` at all, but rather do something else
+  // with the raw data.
+  adapter(frames, language, token) {
+    return animateHTML(frames, {
+      tabSize: 2,
+      language,
+      theme: monokaiDark,
+    });
+  },
 
   // Because the language modules are HUGE and can be configured in a variety
   // of ways, you may want to be selective about what you include and how you
@@ -108,33 +117,64 @@ const codeMoviePlugin = markedCodeMoviePlugin({
 marked.use(codeMoviePlugin);
 
 // Time to parse some markdown...
-document.body.innerHTML += marked.parse(`\`\`\`\`code-movie|json
-
-\`\`\`
-[]
-\`\`\`
-
-\`\`\`
-["World"]
-\`\`\`
-
-\`\`\`
-["Hello", "World"]
-\`\`\`
-
-\`\`\`
-[
-  "Hello",
-  "World"
-]
-\`\`\`
-
-\`\`\`\``);
+const markdown = await fetch("./content.md").then((res) => res.text());
+document.body.innerHTML += marked.parse(markdown);
 ```
 
-## Limitations
+## [Decorations](https://code.movie/docs/guides/decorations.html)
 
-There is currently no support for [decorations](https://code.movie/docs/guides/decorations.html).
+You can add decorations as [JSON5-encoded objects](https://www.npmjs.com/package/json5)
+to the individual code blocks inside a `code-movie` block. This can be a single
+decoration object or arrays of objects. The`data` fields are optional and
+default to empty objects.
+
+<!-- prettier-ignore -->
+    ````code-movie|json
+
+    ```
+    []
+    ```
+
+    ```|decorations={ kind: "TEXT", from: 1, to: 8 }
+    ["World"]
+    ```
+
+    ```|decorations=[{ kind: "TEXT", from: 1, to: 8 }, { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }]
+    ["Hello", "World"]
+    ```
+
+    ```|decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "🚫", line: 3 }]
+    [
+      "Hello",
+      "World"
+    ]
+    ```
+
+    ````
+
+![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
+
+## Metadata
+
+You can add any metadata yo like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
+to a `code-movie` block. This is optional and defaults to an empty object:
+
+    ````code-movie|json|meta={ value: 42 }
+
+    ```
+    [23]
+    ```
+
+    ```
+    [42]
+    ```
+
+    ````
+
+Metadata has no immediate effect, but is is available as `token.meta` in the
+adapter function. You could use to control markup creation (to eg. allow ad-hoc
+addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
+or maybe switch themes entirely.
 
 ## Customization
 
