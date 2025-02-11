@@ -3,9 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Demo</title>
+    <style>
+      :root {
+        --cm-scene-background: transparent;
+        --cm-line-numbers-enabled: 1;
+      }
+    </style>
   </head>
-  <body style="--cm-scene-background: transparent">
+  <body>
     <script type="module">
       // Import Marked and the plugin
       import { marked } from "https://cdn.jsdelivr.net/npm/marked@15.0.6/lib/marked.esm.js";
@@ -15,10 +21,10 @@
         monokaiDark,
       } from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/index.js";
 
-      // For flexibility reasons, the plugin does not ship with the main library.
-      // You need to load the required functions, themes and language modules from
-      // somewhere, either a CDN as shown below or from your local installation of
-      // @codemovie/code-movie.
+      // For flexibility reasons, the plugin does not ship with the main
+      // library. You will need to load the required functions, themes and
+      // language modules from somewhere, either a CDN as shown below or from
+      // your local installation of @codemovie/code-movie.
       import json from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/json.js";
       import ecmascript from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/ecmascript.js";
 
@@ -29,13 +35,24 @@
       // Set the options for the plugin
       const codeMoviePlugin = markedCodeMoviePlugin({
         // Because the core library is not bundled with the plugin, you need to
-        // provide an adapter function. The adapter function is called with frame
-        // objects and the appropriate language module, which you can pass on to
-        // your particular version of the core library. If you want to tweak the tab
-        // size, theme, or run some side effects, this is the place to do that. You
-        // can also add extra HTML before, after, or around the output.
-        adapter: (frames, language) =>
-          animateHTML(frames, { tabSize: 2, language, theme: monokaiDark }),
+        // provide an adapter function. The adapter function is called with the
+        // array of frame objects, the relevant language object, and the Marked
+        // token for the animation. You can pass the first two arguments on to
+        // your particular version of the core library. The token might be
+        // interesting if you want to run `animateHTML()` with different
+        // arguments depending on metadata present in the token. If you want to
+        // tweak the tab size, theme, or run some side effects (maybe depending
+        // on the aforementioned metadata), this is the place to do that. You
+        // can also add extra HTML before, after, or around the output... or not
+        // call `animateHTML()` at all, but rather do something else with the
+        // raw data.
+        adapter(frames, language, token) {
+          return animateHTML(frames, {
+            tabSize: 2,
+            language,
+            theme: monokaiDark,
+          });
+        },
 
         // Because the language modules are HUGE and can be configured in a variety
         // of ways, you may want to be selective about what you include and how you
@@ -70,28 +87,8 @@
       marked.use(codeMoviePlugin);
 
       // Time to parse some markdown...
-      document.body.innerHTML += marked.parse(`\`\`\`\`code-movie|json
-
-\`\`\`
-[]
-\`\`\`
-
-\`\`\`
-["World"]
-\`\`\`
-
-\`\`\`
-["Hello", "World"]
-\`\`\`
-
-\`\`\`
-[
-  "Hello",
-  "World"
-]
-\`\`\`
-
-\`\`\`\``);
+      const markdown = await fetch("./content.md").then((res) => res.text());
+      document.body.innerHTML += marked.parse(markdown);
     </script>
   </body>
 </html>
