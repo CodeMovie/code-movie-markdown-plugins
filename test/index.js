@@ -210,6 +210,38 @@ suite("Decorations", () => {
       `{"frames":[{"code":"[]","decorations":[]},{"code":"[\\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}]},{"code":"[\\"Hello\\", \\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}]},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","text":"✅","line":2,"data":{}},{"kind":"GUTTER","text":"❌","line":3,"data":{}}]}],"lang":"json","meta":{}}`,
     );
   });
+
+  test("parsing single decorations with curly braces present in the content", () => {
+    const text = `\`\`\`\`code-movie|json
+\`\`\`|decorations={ kind: "GUTTER", line: 1, text: "❌" }
+{ "a": 1 }
+\`\`\`
+\`\`\`|decorations={ kind: "GUTTER", line: 1, text: "✅" }
+{ "a": 2 }
+\`\`\`
+\`\`\`\``;
+    const actual = marked.parse(text);
+    assert.strictEqual(
+      actual,
+      `{"frames":[{"code":"{ \\"a\\": 1 }","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}]},{"code":"{ \\"a\\": 2 }","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}]}],"lang":"json","meta":{}}`,
+    );
+  });
+
+  test("parsing gutter decoration arrays with curly braces present in the content", () => {
+    const text = `\`\`\`\`code-movie|json
+\`\`\`|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }]
+{ "a": 1 }
+\`\`\`
+\`\`\`|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }]
+{ "a": 2 }
+\`\`\`
+\`\`\`\``;
+    const actual = marked.parse(text);
+    assert.strictEqual(
+      actual,
+      `{"frames":[{"code":"{ \\"a\\": 1 }","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}]},{"code":"{ \\"a\\": 2 }","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}]}],"lang":"json","meta":{}}`,
+    );
+  });
 });
 
 suite("Metadata", () => {
@@ -226,6 +258,22 @@ suite("Metadata", () => {
     assert.strictEqual(
       actual,
       `{"frames":[{"code":"[23]","decorations":[]},{"code":"[42]","decorations":[]}],"lang":"json","meta":{"value":42}}`,
+    );
+  });
+
+  test("parsing metadata with curly braces present in the content", () => {
+    const text = `\`\`\`\`code-movie|json|meta={ value: 42 }
+\`\`\`
+{ "a": 1 }
+\`\`\`
+\`\`\`
+{ "a": 2 }
+\`\`\`
+\`\`\`\``;
+    const actual = marked.parse(text);
+    assert.strictEqual(
+      actual,
+      `{"frames":[{"code":"{ \\"a\\": 1 }","decorations":[]},{"code":"{ \\"a\\": 2 }","decorations":[]}],"lang":"json","meta":{"value":42}}`,
     );
   });
 });

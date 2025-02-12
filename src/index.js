@@ -47,7 +47,7 @@ export function markedCodeMoviePlugin({
         start: (src) => src.match(/`{4}code-movie\|[a-z-]+/)?.index,
         tokenizer(src) {
           const rule =
-            /^`{4}code-movie\|(?<lang>[a-z-]+)(?<meta>\|meta={.*})?(?<content>.*)`{4}/s;
+            /^`{4}code-movie\|(?<lang>[a-z-]+)(?<meta>\|meta={.*?}(?=\s+```))?(?<content>.*)`{4}/s;
           const match = rule.exec(src);
           if (!match) {
             return;
