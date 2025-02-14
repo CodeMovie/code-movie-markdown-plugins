@@ -152,6 +152,8 @@ default to empty objects.
 
     ````
 
+Neither the decoration objects nor the containing array can currently contain line breaks.
+
 ![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
 
 ## Metadata
