@@ -156,8 +156,9 @@ default to empty objects.
 
 ## Metadata
 
-You can add any metadata yo like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
-to a `code-movie` block. This is optional and defaults to an empty object:
+You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
+to a `code-movie` block after the language. This is optional and defaults to an
+empty object:
 
     ````code-movie|json|meta={ value: 42 }
 
@@ -171,10 +172,12 @@ to a `code-movie` block. This is optional and defaults to an empty object:
 
     ````
 
+The object can contain line breaks.
+
 Metadata has no immediate effect, but is is available as `token.meta` in the
 adapter function. You could use to control markup creation (to eg. allow ad-hoc
 addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
-or maybe switch themes entirely.
+or switch themes entirely.
 
 ## Customization
 

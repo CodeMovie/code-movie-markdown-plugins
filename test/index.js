@@ -276,4 +276,22 @@ suite("Metadata", () => {
       `{"frames":[{"code":"{ \\"a\\": 1 }","decorations":[]},{"code":"{ \\"a\\": 2 }","decorations":[]}],"lang":"json","meta":{"value":42}}`,
     );
   });
+
+  test("parsing metadata with line breaks in the metadata object", () => {
+    const text = `\`\`\`\`code-movie|json|meta={
+  value: 42
+}
+\`\`\`
+{ "a": 1 }
+\`\`\`
+\`\`\`
+{ "a": 2 }
+\`\`\`
+\`\`\`\``;
+    const actual = marked.parse(text);
+    assert.strictEqual(
+      actual,
+      `{"frames":[{"code":"{ \\"a\\": 1 }","decorations":[]},{"code":"{ \\"a\\": 2 }","decorations":[]}],"lang":"json","meta":{"value":42}}`,
+    );
+  });
 });
