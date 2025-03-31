@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Demo</title>
+    <title>Demo (Animation)</title>
     <style>
       :root {
         --cm-scene-background: transparent;
@@ -87,7 +87,7 @@
       marked.use(codeMoviePlugin);
 
       // Time to parse some markdown...
-      const markdown = await fetch("./content.md").then((res) => res.text());
+      const markdown = await fetch("./index.md").then((res) => res.text());
       document.body.innerHTML += marked.parse(markdown);
     </script>
   </body>

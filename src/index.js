@@ -75,7 +75,11 @@ export function markedCodeMoviePlugin({
               return [];
             }
             return [
-              { code: child.text, decorations: parseDecorations(child.lang) },
+              {
+                code: child.text,
+                decorations: parseDecorations(child.lang),
+                ranges: [],
+              },
             ];
           });
           const html = adapter(frames, languages[token.lang], token);
@@ -88,6 +92,51 @@ export function markedCodeMoviePlugin({
             return `<code-movie-runtime keyframes="${keyframesAttr}"${controlsAttr}>${html}</code-movie-runtime>`;
           }
           return html;
+        },
+      },
+    ],
+  };
+}
+
+export function markedCodeMovieHighlightPlugin({ adapter, languages }) {
+  return {
+    extensions: [
+      {
+        name: "codeMovieHighlight",
+        level: "block",
+        start: (src) => src.match(/`{4}code-movie-highlight\|[a-z-]+/)?.index,
+        tokenizer(src) {
+          const rule =
+            /^`{4}code-movie-highlight\|(?<lang>[a-z-]+)?(?<decorations>\|decorations=.*?)?\n(?<content>.*)`{4}/s;
+          const match = rule.exec(src);
+          if (!match) {
+            return;
+          }
+          const { content, lang, decorations = "" } = match.groups;
+          const invalid = !(lang in languages);
+          const fallback = new this.lexer.constructor(this.lexer.options).lex(
+            "```" + lang + "\n" + content + "\n```",
+          );
+          return {
+            type: "codeMovieHighlight",
+            raw: match[0],
+            lang,
+            decorations: parseDecorations(decorations),
+            invalid,
+            content: content.trim(),
+            fallback,
+          };
+        },
+
+        renderer(token) {
+          if (token.invalid) {
+            return this.parser.parse(token.fallback);
+          }
+          return adapter(
+            { code: token.content, decorations: token.decoration, ranges: [] },
+            languages[token.lang],
+            token,
+          );
         },
       },
     ],

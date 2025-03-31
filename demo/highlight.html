@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo (Highlight)</title>
+    <style>
+      :root {
+        --cm-scene-background: transparent;
+        --cm-line-numbers-enabled: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import { marked } from "https://cdn.jsdelivr.net/npm/marked@15.0.6/lib/marked.esm.js";
+      import { markedCodeMovieHighlightPlugin } from "../dist/index.js";
+      import {
+        fromStringToTokens,
+        toHighlightHTML,
+        monokaiDark,
+      } from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/index.js";
+      import json from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/json.js";
+      import ecmascript from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/ecmascript.js";
+
+      const codeMovieHighlightPlugin = markedCodeMovieHighlightPlugin({
+        adapter(frame, language, token) {
+          return toHighlightHTML(
+            fromStringToTokens(frame, { tabSize: 2, language }),
+            { theme: monokaiDark },
+          );
+        },
+        languages: {
+          json: json(),
+          javascript: ecmascript({ ts: false }),
+          typescript: ecmascript({ ts: true }),
+        },
+      });
+
+      // Pass the plugin to Marked. Done!
+      marked.use(codeMovieHighlightPlugin);
+
+      // Time to parse some markdown...
+      const markdown = await fetch("./highlight.md").then((res) => res.text());
+      console.log(marked.parse(markdown));
+      document.body.innerHTML += marked.parse(markdown);
+    </script>
+  </body>
+</html>
