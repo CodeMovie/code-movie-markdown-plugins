@@ -78,7 +78,6 @@ export function markedCodeMoviePlugin({
               {
                 code: child.text,
                 decorations: parseDecorations(child.lang),
-                ranges: [],
               },
             ];
           });
@@ -133,7 +132,7 @@ export function markedCodeMovieHighlightPlugin({ adapter, languages }) {
             return this.parser.parse(token.fallback);
           }
           return adapter(
-            { code: token.content, decorations: token.decoration, ranges: [] },
+            { code: token.content, decorations: token.decoration },
             languages[token.lang],
             token,
           );
