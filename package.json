@@ -21,11 +21,11 @@
     "marked": "^15.0.0"
   },
   "devDependencies": {
-    "esbuild": "^0.24.00",
+    "esbuild": "^0.25.00",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.0.0",
     "prettier": "^3.3.0",
-    "release-it": "^17.10.0"
+    "release-it": "^18.0.0"
   },
   "repository": {
     "type": "git",
