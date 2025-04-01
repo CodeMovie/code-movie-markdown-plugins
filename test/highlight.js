@@ -1,11 +1,11 @@
 import test, { suite } from "node:test";
 import assert from "node:assert";
 import { Marked } from "marked";
-import { markedCodeMovieHighlightPlugin } from "../src/index.js";
+import { markedCodeMoviePlugin } from "../src/index.js";
 
 const marked = new Marked();
 
-const plugin = markedCodeMovieHighlightPlugin({
+const plugin = markedCodeMoviePlugin({
   adapter: (frame, lang, token) =>
     JSON.stringify({ frame, lang, meta: token.meta }),
   languages: {
@@ -15,7 +15,7 @@ const plugin = markedCodeMovieHighlightPlugin({
 
 marked.use(plugin);
 
-suite.only("Highlighting", () => {
+suite("Highlighting", () => {
   suite("General plugin functionality", () => {
     test("parsing markdown into a frame", () => {
       const text = `%%(json)
@@ -92,6 +92,52 @@ More content!`;
 {"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}<p>World!</p>
 {"frame":{"code":"[1, 2, 3]","decorations":[]},"lang":"json","meta":{}}<p>More content!</p>\n`,
       );
+    });
+
+    test("handling no content", () => {
+      const actual = marked.parse("%%(json)\n%%");
+      assert.strictEqual(
+        actual,
+        '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
+      );
+    });
+
+    test("handling whitespace-only content", () => {
+      const actual = marked.parse("%%(json)\n  \n  \n%%");
+      assert.strictEqual(
+        actual,
+        '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
+      );
+    });
+
+    test("error on unavailable language", () => {
+      const text = `%%(foobar)
+[
+  "Hello",
+  "World"
+]
+%%`;
+      assert.throws(() => marked.parse(text), Error, /not available/);
+    });
+
+    test("error on missing language (with parens)", () => {
+      const text = `%%()
+[
+  "Hello",
+  "World"
+]
+%%`;
+      assert.throws(() => marked.parse(text), Error, /not available/);
+    });
+
+    test("error on missing language (without parens)", () => {
+      const text = `%%
+[
+  "Hello",
+  "World"
+]
+%%`;
+      assert.throws(() => marked.parse(text), Error, /not available/);
     });
   });
 

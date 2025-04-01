@@ -1,5 +1,13 @@
 import JSON5 from "json5";
 
+const START_HIGHLIGHT_BLOCK_RE = /^%{2}\(.*?\)\n/;
+const MATCH_HIGHLIGHT_BLOCK_RE =
+  /^%{2}(\((?<lang>[A-Za-z-]+)?(?<args>(?!\)).*?)?\))?\n(?<content>.*?\n?)%{2}/s;
+
+const START_ANIMATE_BLOCK_RE = /`{^%{3}\(.*?\)\n/;
+const MATCH_ANIMATE_BLOCK_RE =
+  /^%{3}(\((?<lang>[A-Za-z-]+)?(?<args>(?!\)).*?)?\))?\n(?<content>.*?\n?)%{3}/s;
+
 function parseArgs(args) {
   let meta = {};
   let decorations = [];
@@ -32,75 +40,77 @@ function parseArgs(args) {
   return { meta, decorations };
 }
 
-function parseDecorations(declaration) {
-  if (declaration.startsWith("|decorations=")) {
-    declaration = declaration.slice(13) || [];
-    try {
-      let parsed = JSON5.parse(declaration);
-      if (!Array.isArray(parsed)) {
-        parsed = [parsed];
-      }
-      return parsed.flatMap((decoration) => {
-        if (["GUTTER", "LINE", "TEXT"].includes(decoration.kind)) {
-          decoration.data ??= {};
-          return [decoration];
-        }
-        return [];
-      });
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
-
-export function markedCodeMoviePlugin({
-  adapter,
-  languages,
-  addRuntime = false,
-}) {
+export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
   return {
     extensions: [
+      // Highlighting extension, also used as a building block of animations
       {
-        name: "codeMovie",
+        name: "codeMovieHighlight",
         level: "block",
-        start: (src) => src.match(/`{4}code-movie\|[a-z-]+/)?.index,
+        start: (src) => src.match(START_HIGHLIGHT_BLOCK_RE)?.index,
         tokenizer(src) {
-          const rule =
-            /^`{4}code-movie\|(?<lang>[a-z-]+)(?<meta>\|meta={.*?}(?=\s+```))?(?<content>.*?)`{4}/s;
-          const match = rule.exec(src);
+          const match = MATCH_HIGHLIGHT_BLOCK_RE.exec(src);
           if (!match) {
             return;
           }
-          const { content, lang, meta = "" } = match.groups;
-          const tokens = this.lexer.blockTokens(content.trim(), []);
-          const invalid = !(lang in languages);
+          const { content, lang, args = "" } = match.groups;
+          const { meta, decorations } = parseArgs(args);
+          return {
+            type: "codeMovieHighlight",
+            raw: match[0],
+            code: content.trim(),
+            decorations,
+            lang,
+            meta,
+          };
+        },
+        renderer(token) {
+          if (!(token.lang in languages)) {
+            throw new Error(
+              `Highlighting failed: language '${token.lang}' not available`,
+            );
+          }
+          return adapter(
+            { code: token.code, decorations: token.decorations },
+            languages[token.lang],
+            token,
+          );
+        },
+      },
+
+      // Animation extension, builds on top of the highlighting extension
+      {
+        name: "codeMovie",
+        level: "block",
+        start: (src) => src.match(START_ANIMATE_BLOCK_RE)?.index,
+        tokenizer(src) {
+          const match = MATCH_ANIMATE_BLOCK_RE.exec(src);
+          if (!match) {
+            return;
+          }
+          const { content, lang, args = "" } = match.groups;
           return {
             type: "codeMovie",
             raw: match[0],
+            tokens: this.lexer.blockTokens(content, []),
+            meta: parseArgs(args).meta,
             lang,
-            meta: parseMeta(meta),
-            invalid,
-            tokens,
           };
         },
-
         renderer(token) {
-          if (token.invalid) {
-            token.tokens.forEach((child) => (child.lang = token.lang));
-            return this.parser.parse(token.tokens);
+          if (!(token.lang in languages)) {
+            throw new Error(
+              `Animating failed: language '${token.lang}' not available`,
+            );
           }
-          const frames = token.tokens.flatMap((child) => {
-            if (child.type !== "code") {
-              return [];
-            }
-            return [
-              {
-                code: child.text,
-                decorations: parseDecorations(child.lang),
-              },
-            ];
-          });
+          const frames = token.tokens.flatMap(
+            ({ type, code, decorations, meta }) => {
+              if (type !== "codeMovieHighlight") {
+                return [];
+              }
+              return [{ code, decorations, meta }];
+            },
+          );
           const html = adapter(frames, languages[token.lang], token);
           if (addRuntime) {
             const controlsAttr =
@@ -111,49 +121,6 @@ export function markedCodeMoviePlugin({
             return `<code-movie-runtime keyframes="${keyframesAttr}"${controlsAttr}>${html}</code-movie-runtime>`;
           }
           return html;
-        },
-      },
-    ],
-  };
-}
-
-export function markedCodeMovieHighlightPlugin({ adapter, languages }) {
-  return {
-    extensions: [
-      {
-        name: "codeMovieHighlight",
-        level: "block",
-        start: (src) => src.match(/^%%\(.*\)\n/)?.index,
-        tokenizer(src) {
-          const rule =
-            /^%%\((?<lang>[A-Za-z-]+)?(?<args>(?!\)).*)?\)\n(?<content>.*?\n)%%/s;
-          const match = rule.exec(src);
-          if (!match) {
-            return;
-          }
-          const { content, lang, args = "" } = match.groups;
-          const { meta, decorations } = parseArgs(args);
-          return {
-            type: "codeMovieHighlight",
-            raw: match[0],
-            content: content.trim(),
-            decorations,
-            lang,
-            meta,
-          };
-        },
-
-        renderer(token) {
-          if (!(token.lang in languages)) {
-            throw new Error(
-              `Highlighting failed: language '${token.lang}' not available`,
-            );
-          }
-          return adapter(
-            { code: token.content, decorations: token.decorations },
-            languages[token.lang],
-            token,
-          );
         },
       },
     ],
