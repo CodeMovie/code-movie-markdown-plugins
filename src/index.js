@@ -1,15 +1,35 @@
 import JSON5 from "json5";
 
-function parseMeta(meta) {
-  if (meta.startsWith("|meta=")) {
-    meta = meta.slice(6) || [];
+function parseArgs(args) {
+  let meta = {};
+  let decorations = [];
+  const metaMatch = /(^|\|)meta=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
+  if (metaMatch) {
     try {
-      return JSON5.parse(meta) || {};
+      meta = JSON5.parse(metaMatch.groups.data) || {};
     } catch {
-      return {};
+      meta = {};
     }
   }
-  return {};
+  const decoMatch = /(^|\|)decorations=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
+  if (decoMatch) {
+    try {
+      let parsed = JSON5.parse(decoMatch.groups.data);
+      if (!Array.isArray(parsed)) {
+        parsed = [parsed];
+      }
+      decorations = parsed.flatMap((decoration) => {
+        if (["GUTTER", "LINE", "TEXT"].includes(decoration.kind)) {
+          decoration.data ??= {};
+          return [decoration];
+        }
+        return [];
+      });
+    } catch {
+      decorations = [];
+    }
+  }
+  return { meta, decorations };
 }
 
 function parseDecorations(declaration) {
@@ -103,36 +123,34 @@ export function markedCodeMovieHighlightPlugin({ adapter, languages }) {
       {
         name: "codeMovieHighlight",
         level: "block",
-        start: (src) => src.match(/`{4}code-movie-highlight\|[a-z-]+/)?.index,
+        start: (src) => src.match(/^%%\(.*\)\n/)?.index,
         tokenizer(src) {
           const rule =
-            /^`{4}code-movie-highlight\|(?<lang>[a-z-]+)?(?<decorations>\|decorations=.*?)?\n(?<content>.*?)`{4}/s;
+            /^%%\((?<lang>[A-Za-z-]+)?(?<args>(?!\)).*)?\)\n(?<content>.*?\n)%%/s;
           const match = rule.exec(src);
           if (!match) {
             return;
           }
-          const { content, lang, decorations = "" } = match.groups;
-          const invalid = !(lang in languages);
-          const fallback = new this.lexer.constructor(this.lexer.options).lex(
-            "```" + lang + "\n" + content + "\n```",
-          );
+          const { content, lang, args = "" } = match.groups;
+          const { meta, decorations } = parseArgs(args);
           return {
             type: "codeMovieHighlight",
             raw: match[0],
-            lang,
-            decorations: parseDecorations(decorations),
-            invalid,
             content: content.trim(),
-            fallback,
+            decorations,
+            lang,
+            meta,
           };
         },
 
         renderer(token) {
-          if (token.invalid) {
-            return this.parser.parse(token.fallback);
+          if (!(token.lang in languages)) {
+            throw new Error(
+              `Highlighting failed: language '${token.lang}' not available`,
+            );
           }
           return adapter(
-            { code: token.content, decorations: token.decoration },
+            { code: token.content, decorations: token.decorations },
             languages[token.lang],
             token,
           );
