@@ -37,6 +37,12 @@ You can install the library as `@codemovie/code-movie-marked-plugin` from NPM,
 [download the latest release from GitHub](https://github.com/CodeMovie/code-movie-marked-plugin/releases)
 or just grab `index.js` [from the source code](https://github.com/CodeMovie/code-movie-marked-plugin/tree/main/dist).
 
+## Demo
+
+After installation, run `npm demo` and visit [localhost:3000/demo/index.html](http://localhost:3000/demo/index.html)
+for a simple demo page. The source code is unminified and has extensive
+comments.
+
 ## Setup
 
 **This plugin does _not_ bundle the core library!** You have to either manually
@@ -124,66 +130,106 @@ document.body.innerHTML += marked.parse(markdown);
 ## Syntax
 
 The animation comprises of **a wrapper block** that starts and ends with `%%%`,
-and **code blocks** that start and end with `%%`:
+and **code blocks** that start and end with `%%`. The wrapper block requires a
+**header**, wrapped in parenthesis, which must at least specify the language to
+use:
 
-### [Decorations](https://code.movie/docs/guides/decorations.html)
+    %%%(json)
+
+    %%
+    "Code Block content"
+    %%
+
+    %%%
+
+Apart from the language, headers can also specify other **arguments**. These are
+pairs of key and [JSON5-encoded values](https://www.npmjs.com/package/json5)
+that pass additional information. Keys always start with a pipe (`|`) symbol.
+Currently there are to arguments available:
+
+- **`|meta`** for both wrapper and code blocks
+- **`|decorations`** for code blocks only
+
+Example:
+
+    %%%(json|meta={ value: "This is metadata!" })
+
+    %%(|meta={ value: "This is also metadata!" })
+    "Code Block content"
+    %%
+
+    %%%
+
+Data from `|meta` can be used as `token.meta` in the adapter function, while
+`|decorations` is specifically for passing [Decorations](https://code.movie/docs/guides/decorations.html)
+to Code.Movie. Both types of arguments are explained in more detail below.
+
+### Metadata: `|meta`
+
+You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
+to a **wrapper block** or **code block**. In case of wrapper blocks the metadata
+argument (like all arguments) must come _after_ the language. The argument is
+always optional and defaults to an empty object:
+
+    %%%(json|meta={ value: "Metadata for the entire animation" })
+
+    %%(json|meta={ value: "Metadata for the first frame" })
+    [23]
+    %%
+
+    %%(json|meta={ value: "Metadata for the second frame" })
+    [42]
+    %%
+
+    %%%
+
+The object can contain line breaks.
+
+#### `|meta` on wrapper blocks
+
+Metadata on wrapper blocks has no immediate effect, but is is available as
+`token.meta` in the adapter function. You could use to control markup creation
+(to eg. allow ad-hoc addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
+or switch themes entirely.
+
+#### `|meta` on code blocks
+
+Metadata on code blocks has no immediate effect, but gets added to the `meta`
+property on the frame objects available in the adapter function.
+
+### [Decorations](https://code.movie/docs/guides/decorations.html): `|decorations`
 
 You can add decorations as [JSON5-encoded arrays](https://www.npmjs.com/package/json5)
 to the individual code blocks inside a `code-movie` block. The`data` fields are
 optional and default to empty objects.
 
 <!-- prettier-ignore -->
-    ````code-movie|json
+    %%%(json)
 
-    ```
+    %%
     []
-    ```
+    %%
 
-    ```|decorations={ kind: "TEXT", from: 1, to: 8 }
+    %%|decorations=[{ kind: "TEXT", from: 1, to: 8 }]
     ["World"]
-    ```
+    %%
 
-    ```|decorations=[{ kind: "TEXT", from: 1, to: 8 }, { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }]
+    %%|decorations=[{ kind: "TEXT", from: 1, to: 8 }, { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }]
     ["Hello", "World"]
-    ```
+    %%
 
-    ```|decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "🚫", line: 3 }]
+    %%|decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "🚫", line: 3 }]
     [
       "Hello",
       "World"
     ]
-    ```
+    %%
 
-    ````
+    %%%
 
 Neither the decoration objects nor the containing array can currently contain line breaks.
 
 ![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
-
-### Metadata
-
-You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
-to a `code-movie` block after the language. This is optional and defaults to an
-empty object:
-
-    ````code-movie|json|meta={ value: 42 }
-
-    ```
-    [23]
-    ```
-
-    ```
-    [42]
-    ```
-
-    ````
-
-The object can contain line breaks.
-
-Metadata has no immediate effect, but is is available as `token.meta` in the
-adapter function. You could use to control markup creation (to eg. allow ad-hoc
-addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
-or switch themes entirely.
 
 ## Customization
 
