@@ -3,31 +3,31 @@
 Author animated code examples with markdown! This plugin extends markdown with a
 wrapper syntax for fenced code blocks:
 
-    ````code-movie|json
+    %%%(json)
 
-    ```
+    %%
     []
-    ```
+    %%
 
-    ```
+    %%
     ["World"]
-    ```
+    %%
 
-    ```
+    %%
     ["Hello", "World"]
-    ```
+    %%
 
-    ```
+    %%
     [
       "Hello",
       "World"
     ]
-    ```
+    %%
 
-    ````
+    %%%
 
-With just a little configuration this turns into animated, syntax highlighted
-code:
+Combined with a moderate amount of plugin configuration the above turns into
+animated, syntax highlighted code:
 
 ![animated code sample](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo.gif)
 
@@ -121,12 +121,16 @@ const markdown = await fetch("./content.md").then((res) => res.text());
 document.body.innerHTML += marked.parse(markdown);
 ```
 
-## [Decorations](https://code.movie/docs/guides/decorations.html)
+## Syntax
 
-You can add decorations as [JSON5-encoded objects](https://www.npmjs.com/package/json5)
-to the individual code blocks inside a `code-movie` block. This can be a single
-decoration object or arrays of objects. The`data` fields are optional and
-default to empty objects.
+The animation comprises of **a wrapper block** that starts and ends with `%%%`,
+and **code blocks** that start and end with `%%`:
+
+### [Decorations](https://code.movie/docs/guides/decorations.html)
+
+You can add decorations as [JSON5-encoded arrays](https://www.npmjs.com/package/json5)
+to the individual code blocks inside a `code-movie` block. The`data` fields are
+optional and default to empty objects.
 
 <!-- prettier-ignore -->
     ````code-movie|json
@@ -156,7 +160,7 @@ Neither the decoration objects nor the containing array can currently contain li
 
 ![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
 
-## Metadata
+### Metadata
 
 You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
 to a `code-movie` block after the language. This is optional and defaults to an
