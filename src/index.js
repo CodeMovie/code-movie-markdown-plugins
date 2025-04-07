@@ -1,12 +1,15 @@
 import JSON5 from "json5";
 
-const START_HIGHLIGHT_BLOCK_RE = /^%{2}\(.*?\)\n/;
+const START_HIGHLIGHT_BLOCK_RE = /^`{3}[ a-zA-Z_-]*\((?:.*?\n?)?\)/;
 const MATCH_HIGHLIGHT_BLOCK_RE =
-  /^%{2}(\((?<lang>[A-Za-z-]+)?(?<args>(?!\)).*?)?\))?\n(?<content>.*?\n?)%{2}/s;
+  /^`{3}(?<lang>[a-zA-Z_-]*) *(?:\((?<args>.*?)\))(?<content>.*?)`{3}/s;
 
-const START_ANIMATE_BLOCK_RE = /`{^%{3}\(.*?\)\n/;
+const START_ANIMATE_BLOCK_RE = /^!{3}[a-zA-Z_-]+(\(.*?\))?\n/;
 const MATCH_ANIMATE_BLOCK_RE =
-  /^%{3}(\((?<lang>[A-Za-z-]+)?(?<args>(?!\)).*?)?\))?\n(?<content>.*?\n?)%{3}/s;
+  /^!{3}(?<lang>[a-zA-Z_-]+) *(?:\((?<args>.*?)\))?(?<content>.*?)!{3}/s;
+
+// MATCH_ANIMATE_BLOCK_RE differs from MATCH_HIGHLIGHT_BLOCK_RE in that it
+// starts and ends with exclamation points and has an optional args list
 
 function parseArgs(args) {
   let meta = {};
@@ -103,14 +106,21 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
               `Animating failed: language '${token.lang}' not available`,
             );
           }
-          const frames = token.tokens.flatMap(
-            ({ type, code, decorations, meta }) => {
-              if (type !== "codeMovieHighlight") {
-                return [];
-              }
-              return [{ code, decorations, meta }];
-            },
-          );
+          const frames = token.tokens.flatMap((token) => {
+            if (token.type === "codeMovieHighlight") {
+              return [
+                {
+                  code: token.code,
+                  decorations: token.decorations,
+                  meta: token.meta,
+                },
+              ];
+            }
+            if (token.type === "code") {
+              return [{ code: token.text, decorations: [], meta: {} }];
+            }
+            return [];
+          });
           const html = adapter(frames, languages[token.lang], token);
           if (addRuntime) {
             const controlsAttr =

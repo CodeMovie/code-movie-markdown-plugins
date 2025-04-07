@@ -15,15 +15,15 @@ marked.use(
 
 suite("Animations", () => {
   suite("General plugin functionality", () => {
-    test("parsing markdown into frames", () => {
-      const text = `%%%(json)
-%%
+    test("parsing markdown into frames - regular fenced code blocks", () => {
+      const text = `!!!json
+\`\`\`
 [23]
-%%
-%%
+\`\`\`
+\`\`\`
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -31,20 +31,36 @@ suite("Animations", () => {
       );
     });
 
-    test("parsing markdown into frames (extra whitespace)", () => {
+    test("parsing markdown into frames - code movie highlight code blocks", () => {
+      const text = `!!!json
+\`\`\`()
+[23]
+\`\`\`
+\`\`\`()
+[42]
+\`\`\`
+!!!`;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
+      );
+    });
+
+    test("parsing markdown into frames (extra whitespace, fenced code blocks)", () => {
       const text = `
 
-%%%(json)
+!!!json
 
-%%
+\`\`\`
 [23]
-%%
+\`\`\`
 
-%%
+\`\`\`
 [42]
-%%
+\`\`\`
 
-%%%
+!!!
 
 `;
       const actual = marked.parse(text);
@@ -57,17 +73,17 @@ suite("Animations", () => {
     test("parsing markdown into frames (leading and trailing content)", () => {
       const text = `Hello!
 
-%%%(json)
+!!!json
 
-%%
+\`\`\`
 [23]
-%%
+\`\`\`
 
-%%
+\`\`\`
 [42]
-%%
+\`\`\`
 
-%%%
+!!!
 
 World!`;
       const actual = marked.parse(text);
@@ -78,25 +94,25 @@ World!`;
     });
 
     test("multiple instances", () => {
-      const text = `%%%(json)
-%%
+      const text = `!!!json
+\`\`\`
 [23]
-%%
-%%
+\`\`\`
+\`\`\`
 [42]
-%%
-%%%
+\`\`\`
+!!!
 
 Text
 
-%%%(json)
-%%
+!!!json
+\`\`\`()
 [23]
-%%
-%%
+\`\`\`
+\`\`\`()
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -106,21 +122,21 @@ Text
     });
 
     test("ignoring non-code children", () => {
-      const text = `%%%(json)
+      const text = `!!!json
 
-%%
+\`\`\`()
 [23]
-%%
+\`\`\`
 
 whatever
 
-%%
+\`\`\`
 [42]
-%%
+\`\`\`
 
 **asdf**
 
-%%%`;
+!!!`;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -129,24 +145,24 @@ whatever
     });
 
     test("handling no content", () => {
-      const actual = marked.parse("%%%(json)\n%%%");
+      const actual = marked.parse("!!!json\n!!!");
       assert.strictEqual(actual, '{"frames":[],"lang":"json","meta":{}}');
     });
 
     test("handling whitespace-only content", () => {
-      const actual = marked.parse("%%%(json)\n  \n  \n%%%");
+      const actual = marked.parse("!!!json\n  \n  \n!!!");
       assert.strictEqual(actual, '{"frames":[],"lang":"json","meta":{}}');
     });
 
     test("error on unavailable language", () => {
-      const text = `%%%(something)
-%%
+      const text = `!!!something
+\`\`\`
 [23]
-%%
-%%
+\`\`\`
+\`\`\`
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
       assert.throws(() => marked.parse(text), Error, /not available/);
     });
 
@@ -161,14 +177,14 @@ whatever
           },
         }),
       );
-      const text = `%%%(json)
-%%
+      const text = `!!!json
+\`\`\`
 [23]
-%%
-%%
+\`\`\`
+\`\`\`
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
       const actual = instance.parse(text);
       assert.strictEqual(
         actual,
@@ -189,14 +205,14 @@ whatever
           },
         }),
       );
-      const text = `%%%(json)
-%%
+      const text = `!!!json
+\`\`\`
 [23]
-%%
-%%
+\`\`\`
+\`\`\`
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
       const actual = instance.parse(text);
       assert.strictEqual(
         actual,
@@ -209,14 +225,14 @@ whatever
     suite("On the top level wrapper", () => {
       test("Metadata", () => {
         test("parsing metadata", () => {
-          const text = `%%%(json|meta={ value: 42 })
-%%
+          const text = `!!!json(|meta={ value: 42 })
+\`\`\`
 [23]
-%%
-%%
+\`\`\`
+\`\`\`
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
           const actual = marked.parse(text);
           assert.strictEqual(
             actual,
@@ -228,14 +244,14 @@ whatever
 
     suite("On code blocks", () => {
       test("single gutter decoration", () => {
-        const text = `%%%(json)
-%%(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
+        const text = `!!!json
+\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
 [23]
-%%
-%%(|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
+\`\`\`
+\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
         const actual = marked.parse(text);
         assert.strictEqual(
           actual,
@@ -244,18 +260,18 @@ whatever
       });
 
       test("multi-line gutter decoration syntax", () => {
-        const text = `%%%(json)
-%%(|decorations=[
+        const text = `!!!json
+\`\`\`(|decorations=[
   { kind: "GUTTER", line: 1, text: "❌" }
 ])
 [23]
-%%
-%%(|decorations=[
+\`\`\`
+\`\`\`(|decorations=[
   { kind: "GUTTER", line: 1, text: "✅" }
       ])
 [42]
-%%
-%%%`;
+\`\`\`
+!!!`;
         const actual = marked.parse(text);
         assert.strictEqual(
           actual,
@@ -264,19 +280,20 @@ whatever
       });
 
       test("mixed decorations and metadata with whitespace", () => {
-        const text = `%%%(json)
-%%(|meta={ frame: 0 })
-[]
-%%
+        const text = `!!!json
 
-%%(
+\`\`\`(|meta={ frame: 0 })
+[]
+\`\`\`
+
+\`\`\`(
   |meta={ frame: 1 }
   |decorations=[{ kind: "TEXT", from: 1, to: 8 }]
 )
 ["World"]
-%%
+\`\`\`
 
-%%(
+\`\`\`(
   |decorations=[
     { kind: "TEXT", from: 1, to: 8 },
     { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
@@ -286,15 +303,16 @@ whatever
   }
 )
 ["Hello", "World"]
-%%
+\`\`\`
 
-%%(|decorations=meta={ frame: 3 }[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "❌", line: 3 }])
+\`\`\`(|decorations=meta={ frame: 3 }[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "❌", line: 3 }])
 [
   "Hello",
   "World"
 ]
-%%
-%%%`;
+\`\`\`
+
+!!!`;
         const actual = marked.parse(text);
         assert.strictEqual(
           actual,

@@ -3,28 +3,28 @@
 Author animated code examples with markdown! This plugin extends markdown with a
 wrapper syntax for fenced code blocks:
 
-    %%%(json)
+    !!!json
 
-    %%
+    ```
     []
-    %%
+    ```
 
-    %%
+    ```
     ["World"]
-    %%
+    ```
 
-    %%
+    ```
     ["Hello", "World"]
-    %%
+    ```
 
-    %%
+    ```
     [
       "Hello",
       "World"
     ]
-    %%
+    ```
 
-    %%%
+    !!!
 
 Combined with a moderate amount of plugin configuration the above turns into
 animated, syntax highlighted code:
@@ -129,59 +129,76 @@ document.body.innerHTML += marked.parse(markdown);
 
 ## Syntax
 
-The animation comprises of **a wrapper block** that starts and ends with `%%%`,
-and **code blocks** that start and end with `%%`. The wrapper block requires a
-**header**, wrapped in parenthesis, which must at least specify the language to
-use:
+The animation comprises of **a wrapper block** that, similar to fenced code
+blocks, starts and ends with `!!!`. The desired programming language comes after
+the opening trio of exclamation points. The animations keyframes are built up
+from **code blocks**. These can be either regular fenced code blocks or an
+extended variant that we will cover shortly.
 
-    %%%(json)
+The most basic example therefore looks as follows:
 
-    %%
-    "Code Block content"
-    %%
+    !!!json
 
-    %%%
+    ```
+    "Code block content, first keyframe"
+    ```
 
-Apart from the language, headers can also specify other **arguments**. These are
-pairs of key and [JSON5-encoded values](https://www.npmjs.com/package/json5)
-that pass additional information. Keys always start with a pipe (`|`) symbol.
-Currently there are to arguments available:
+    ```
+    "Code Block content, second keyframe"
+    ```
 
-- **`|meta`** for both wrapper and code blocks
-- **`|decorations`** for code blocks only
+    !!!
+
+Both the wrapper block and the code blocks can take **arguments**. These are
+pairs of keys and [JSON5-encoded values](https://www.npmjs.com/package/json5),
+wrapped in parenthesis, that pass additional information. Keys always start with
+a pipe (`|`) symbol and are always immediately followed by an equals sign (`=`).
+Currently there are two arguments available:
+
+- **`|meta=`** for both wrapper and code blocks
+- **`|decorations=`** for code blocks only
 
 Example:
 
-    %%%(json|meta={ value: "This is metadata!" })
+    !!!json(|meta={ value: "This is metadata for the wrapper" })
 
-    %%(|meta={ value: "This is also metadata!" })
-    "Code Block content"
-    %%
+    ```(|meta={ value: "This is metadata for the first frame" })
+    "Code block content, first keyframe"
+    ```
 
-    %%%
+    ```(
+      |meta={
+        value: "This is metadata for the second frame. With whitespace!"
+      }
+    )
+    "Code Block content, second keyframe"
+    ```
+
+    !!!
 
 Data from `|meta` can be used as `token.meta` in the adapter function, while
-`|decorations` is specifically for passing [Decorations](https://code.movie/docs/guides/decorations.html)
-to Code.Movie. Both types of arguments are explained in more detail below.
+`|decorations` is specifically for
+[Decorations](https://code.movie/docs/guides/decorations.html). Both types of
+arguments are explained in more detail below. The arguments lists can contain
+whitespace
 
 ### Metadata: `|meta`
 
 You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
-to a **wrapper block** or **code block**. In case of wrapper blocks the metadata
-argument (like all arguments) must come _after_ the language. The argument is
-always optional and defaults to an empty object:
+to a **wrapper block** or **code block**. The argument is always optional and
+defaults to an empty object:
 
-    %%%(json|meta={ value: "Metadata for the entire animation" })
+    !!!json(|meta={ value: "Metadata for the entire animation" })
 
-    %%(json|meta={ value: "Metadata for the first frame" })
+    ```(|meta={ value: "Metadata for the first frame" })
     [23]
-    %%
+    ```
 
-    %%(json|meta={ value: "Metadata for the second frame" })
+    ```(|meta={ value: "Metadata for the second frame" })
     [42]
-    %%
+    ```
 
-    %%%
+    !!!
 
 The object can contain line breaks.
 
@@ -190,7 +207,7 @@ The object can contain line breaks.
 Metadata on wrapper blocks has no immediate effect, but is is available as
 `token.meta` in the adapter function. You could use to control markup creation
 (to eg. allow ad-hoc addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
-or switch themes entirely.
+or switch [themes](https://code.movie/docs/reference/themes.html) entirely.
 
 #### `|meta` on code blocks
 
@@ -203,33 +220,58 @@ You can add decorations as [JSON5-encoded arrays](https://www.npmjs.com/package/
 to the individual code blocks inside a `code-movie` block. The`data` fields are
 optional and default to empty objects.
 
-<!-- prettier-ignore -->
-    %%%(json)
+    !!!json
 
-    %%
+    ```
     []
-    %%
+    ```
 
-    %%|decorations=[{ kind: "TEXT", from: 1, to: 8 }]
+    ```(|decorations=[{ kind: "TEXT", from: 1, to: 8 }])
     ["World"]
-    %%
+    ```
 
-    %%|decorations=[{ kind: "TEXT", from: 1, to: 8 }, { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }]
+    ```(|decorations=[
+      { kind: "TEXT", from: 1, to: 8 },
+      { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
+    ])
     ["Hello", "World"]
-    %%
+    ```
 
-    %%|decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "🚫", line: 3 }]
+    ```(|decorations=[
+      { kind: "GUTTER", text: "✅", line: 2 },
+      { kind: "GUTTER", text: "🚫", line: 3 }
+    ])
     [
       "Hello",
       "World"
     ]
-    %%
+    ```
 
-    %%%
+    !!!
 
 Neither the decoration objects nor the containing array can currently contain line breaks.
 
 ![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
+
+### Language
+
+Languages on code blocks are not required, but you might want to add them anyway
+to enable syntax highlighting in your code editor.
+
+    !!!json
+
+    ```json
+    ["The language is not needed, but maybe you want it"]
+    ```
+
+    ```json (
+      |meta={ info: "Frame 1" }
+      |decorations=[{ kind: "TEXT", from: 1, to: 8 }]
+    )
+    ["Note that a space between the language and the arguments is valid!"]
+    ```
+
+    !!!
 
 ## Customization
 

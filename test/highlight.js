@@ -16,14 +16,54 @@ const plugin = markedCodeMoviePlugin({
 marked.use(plugin);
 
 suite("Highlighting", () => {
-  suite("General plugin functionality", () => {
-    test("parsing markdown into a frame", () => {
-      const text = `%%(json)
+  suite("No breakage of existing functionality", () => {
+    test("regular code blocks keep working", () => {
+      const text = `\`\`\`json
 [
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `<pre><code class="language-json">[
+  &quot;Hello&quot;,
+  &quot;World&quot;
+]
+</code></pre>
+`,
+      );
+    });
+
+    test("regular bare code blocks keep working", () => {
+      const text = `\`\`\`
+[
+  "Hello",
+  "World"
+]
+\`\`\``;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `<pre><code>[
+  &quot;Hello&quot;,
+  &quot;World&quot;
+]
+</code></pre>
+`,
+      );
+    });
+  });
+
+  suite("General plugin functionality", () => {
+    test("parsing markdown into a frame", () => {
+      const text = `\`\`\`json()
+[
+  "Hello",
+  "World"
+]
+\`\`\``;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -34,12 +74,12 @@ suite("Highlighting", () => {
     test("parsing markdown into a frame (leading and trailing whitespace)", () => {
       const text = `
 
-%%(json)
+\`\`\`json()
 [
   "Hello",
   "World"
 ]
-%%
+\`\`\`
 
 `;
       const actual = marked.parse(text);
@@ -52,12 +92,12 @@ suite("Highlighting", () => {
     test("parsing markdown into a frame (leading and trailing content)", () => {
       const text = `Hello!
 
-%%(json)
+\`\`\`json()
 [
   "Hello",
   "World"
 ]
-%%
+\`\`\`
 
 World!`;
       const actual = marked.parse(text);
@@ -71,18 +111,18 @@ World!`;
     test("handing multiple instances", () => {
       const text = `Hello!
 
-%%(json)
+\`\`\`json()
 [
   "Hello",
   "World"
 ]
-%%
+\`\`\`
 
 World!
 
-%%(json)
+\`\`\`json()
 [1, 2, 3]
-%%
+\`\`\`
 
 More content!`;
       const actual = marked.parse(text);
@@ -95,7 +135,7 @@ More content!`;
     });
 
     test("handling no content", () => {
-      const actual = marked.parse("%%(json)\n%%");
+      const actual = marked.parse("```json()\n```");
       assert.strictEqual(
         actual,
         '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
@@ -103,7 +143,7 @@ More content!`;
     });
 
     test("handling whitespace-only content", () => {
-      const actual = marked.parse("%%(json)\n  \n  \n%%");
+      const actual = marked.parse("```json()\n  \n  \n```");
       assert.strictEqual(
         actual,
         '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
@@ -111,44 +151,34 @@ More content!`;
     });
 
     test("error on unavailable language", () => {
-      const text = `%%(foobar)
+      const text = `\`\`\`foobar()
 [
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
       assert.throws(() => marked.parse(text), Error, /not available/);
     });
 
     test("error on missing language (with parens)", () => {
-      const text = `%%()
+      const text = `\`\`\`()
 [
   "Hello",
   "World"
 ]
-%%`;
-      assert.throws(() => marked.parse(text), Error, /not available/);
-    });
-
-    test("error on missing language (without parens)", () => {
-      const text = `%%
-[
-  "Hello",
-  "World"
-]
-%%`;
+\`\`\``;
       assert.throws(() => marked.parse(text), Error, /not available/);
     });
   });
 
   suite("Arguments", () => {
     test("handing metadata", () => {
-      const text = `%%(json|meta={ test: 42 })
+      const text = `\`\`\`json(|meta={ test: 42 })
 [
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -157,14 +187,14 @@ More content!`;
     });
 
     test("handing multi-line metadata", () => {
-      const text = `%%(json|meta={
+      const text = `\`\`\`json(|meta={
   test: 42
 })
 [
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -173,12 +203,12 @@ More content!`;
     });
 
     test("handing a single gutter decoration", () => {
-      const text = `%%(json|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
+      const text = `\`\`\`json(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
 [
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -187,7 +217,7 @@ More content!`;
     });
 
     test("handing multiple decorations, multiline", () => {
-      const text = `%%(json|decorations=[
+      const text = `\`\`\`json(|decorations=[
   { kind: "GUTTER", line: 1, text: "❌" },
   { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
 ])
@@ -195,7 +225,7 @@ More content!`;
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
@@ -204,7 +234,7 @@ More content!`;
     });
 
     test("handing metadata and multiple decorations with large amounts of whitespace", () => {
-      const text = `%%(json
+      const text = `\`\`\`json(
   |decorations=[
     { kind: "GUTTER", line: 1, text: "❌" },
     { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
@@ -217,7 +247,7 @@ More content!`;
   "Hello",
   "World"
 ]
-%%`;
+\`\`\``;
       const actual = marked.parse(text);
       assert.strictEqual(
         actual,
