@@ -71,6 +71,7 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
           if (!(token.lang in languages)) {
             throw new Error(
               `Highlighting failed: language '${token.lang}' not available`,
+              { cause: token },
             );
           }
           return adapter(
@@ -104,6 +105,7 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
           if (!(token.lang in languages)) {
             throw new Error(
               `Animating failed: language '${token.lang}' not available`,
+              { cause: token },
             );
           }
           const frames = token.tokens.flatMap((token) => {
