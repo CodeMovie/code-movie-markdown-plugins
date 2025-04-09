@@ -18,7 +18,8 @@ function parseArgs(args) {
   if (metaMatch) {
     try {
       meta = JSON5.parse(metaMatch.groups.data) || {};
-    } catch {
+    } catch (e) {
+      console.warn("Unable to parse JSON5 for argument '|meta':", e);
       meta = {};
     }
   }
@@ -36,7 +37,8 @@ function parseArgs(args) {
         }
         return [];
       });
-    } catch {
+    } catch (e) {
+      console.warn("Unable to parse JSON5 for argument '|decorations':", e);
       decorations = [];
     }
   }
