@@ -11,16 +11,17 @@ const MATCH_ANIMATE_BLOCK_RE =
 // MATCH_ANIMATE_BLOCK_RE differs from MATCH_HIGHLIGHT_BLOCK_RE in that it
 // starts and ends with exclamation points and has an optional args list
 
-function parseArgs(args) {
+function parseArgs(args, source) {
   let meta = {};
   let decorations = [];
   const metaMatch = /(^|\|)meta=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
   if (metaMatch) {
     try {
       meta = JSON5.parse(metaMatch.groups.data) || {};
-    } catch (e) {
-      console.warn("Unable to parse JSON5 for argument '|meta':", e);
-      meta = {};
+    } catch (error) {
+      throw new SyntaxError("Unable to parse JSON5 for argument '|meta':", {
+        cause: { error, json5: metaMatch.groups.data, source },
+      });
     }
   }
   const decoMatch = /(^|\|)decorations=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
@@ -37,9 +38,11 @@ function parseArgs(args) {
         }
         return [];
       });
-    } catch (e) {
-      console.warn("Unable to parse JSON5 for argument '|decorations':", e);
-      decorations = [];
+    } catch (error) {
+      throw new SyntaxError(
+        "Unable to parse JSON5 for argument '|decorations':",
+        { cause: { error, json5: metaMatch.groups.data, source } },
+      );
     }
   }
   return { meta, decorations };
@@ -59,7 +62,7 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
             return;
           }
           const { content, lang, args = "" } = match.groups;
-          const { meta, decorations } = parseArgs(args);
+          const { meta, decorations } = parseArgs(args, match[0]);
           return {
             type: "codeMovieHighlight",
             raw: match[0],
@@ -99,7 +102,7 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
             type: "codeMovie",
             raw: match[0],
             tokens: this.lexer.blockTokens(content, []),
-            meta: parseArgs(args).meta,
+            meta: parseArgs(args, match[0]).meta,
             lang,
           };
         },

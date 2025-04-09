@@ -305,7 +305,7 @@ whatever
 ["Hello", "World"]
 \`\`\`
 
-\`\`\`(|decorations=meta={ frame: 3 }[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "❌", line: 3 }])
+\`\`\`(|meta={ frame: 3 }|decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "❌", line: 3 }])
 [
   "Hello",
   "World"
@@ -316,7 +316,7 @@ whatever
         const actual = marked.parse(text);
         assert.strictEqual(
           actual,
-          '{"frames":[{"code":"[]","decorations":[],"meta":{"frame":0}},{"code":"[\\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}],"meta":{"frame":1}},{"code":"[\\"Hello\\", \\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"meta":{"frame":2}},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"meta":{}}],"lang":"json","meta":{}}',
+          '{"frames":[{"code":"[]","decorations":[],"meta":{"frame":0}},{"code":"[\\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}],"meta":{"frame":1}},{"code":"[\\"Hello\\", \\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"meta":{"frame":2}},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","text":"✅","line":2,"data":{}},{"kind":"GUTTER","text":"❌","line":3,"data":{}}],"meta":{"frame":3}}],"lang":"json","meta":{}}',
         );
       });
     });
