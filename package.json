@@ -1,6 +1,6 @@
 {
   "name": "@codemovie/code-movie-marked-plugin",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Code.Movie plugin for Marked",
   "main": "dist/index.js",
   "browser": "dist/index.js",
