@@ -2,7 +2,7 @@ import JSON5 from "json5";
 
 const START_HIGHLIGHT_BLOCK_RE = /^`{3}[ a-zA-Z_-]*\((?:.*?\n?)?\)/;
 const MATCH_HIGHLIGHT_BLOCK_RE =
-  /^`{3}(?<lang>[a-zA-Z_-]*) *(?:\((?<args>.*?)\))(?<content>.*?)`{3}/s;
+  /^(?<backticks>`{3}`?)(?<lang>[a-zA-Z_-]*) *(?:\((?<args>.*?)\))(?<content>.*?)\k<backticks>/s;
 
 const START_ANIMATE_BLOCK_RE = /^!{3}[a-zA-Z_-]+(\(.*?\))?\n/;
 const MATCH_ANIMATE_BLOCK_RE =

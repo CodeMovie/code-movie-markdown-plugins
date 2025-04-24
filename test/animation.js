@@ -9,6 +9,7 @@ marked.use(
       JSON.stringify({ frames, lang, meta: token.meta }),
     languages: {
       json: "json",
+      plaintext: "plaintext",
     },
   }),
 );
@@ -31,6 +32,62 @@ suite("Animations", () => {
       );
     });
 
+    test("parsing markdown into frames - regular fenced code blocks, multi-line content", () => {
+      const text = `!!!json
+\`\`\`
+[
+  23
+]
+\`\`\`
+\`\`\`
+[
+  42
+]
+\`\`\`
+!!!`;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `{"frames":[{"code":"[\\n  23\\n]","decorations":[],"meta":{}},{"code":"[\\n  42\\n]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
+      );
+    });
+
+    test("parsing markdown into frames - quad-backtick fenced code blocks", () => {
+      const text = `!!!json
+\`\`\`\`
+[23]
+\`\`\`\`
+\`\`\`\`
+[42]
+\`\`\`\`
+!!!`;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
+      );
+    });
+
+    test("parsing markdown into frames - quad-backtick fenced code blocks over regular fenced code blocks", () => {
+      const text = `!!!json
+\`\`\`\`
+\`\`\`
+[23]
+\`\`\`
+\`\`\`\`
+\`\`\`\`
+\`\`\`
+[42]
+\`\`\`
+\`\`\`\`
+!!!`;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","decorations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
+      );
+    });
+
     test("parsing markdown into frames - code movie highlight code blocks", () => {
       const text = `!!!json
 \`\`\`()
@@ -44,6 +101,26 @@ suite("Animations", () => {
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
+      );
+    });
+
+    test("parsing markdown into frames - quad-backtick code movie blocks over regular fenced code blocks", () => {
+      const text = `!!!json
+\`\`\`\`()
+\`\`\`
+[23]
+\`\`\`
+\`\`\`\`
+\`\`\`\`()
+\`\`\`
+[42]
+\`\`\`
+\`\`\`\`
+!!!`;
+      const actual = marked.parse(text);
+      assert.strictEqual(
+        actual,
+        `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","decorations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -243,6 +320,22 @@ whatever
     });
 
     suite("On code blocks", () => {
+      test("empty", () => {
+        const text = `!!!json
+\`\`\`()
+[23]
+\`\`\`
+\`\`\`()
+[42]
+\`\`\`
+!!!`;
+        const actual = marked.parse(text);
+        assert.strictEqual(
+          actual,
+          `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        );
+      });
+
       test("single gutter decoration", () => {
         const text = `!!!json
 \`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
@@ -251,6 +344,22 @@ whatever
 \`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
 [42]
 \`\`\`
+!!!`;
+        const actual = marked.parse(text);
+        assert.strictEqual(
+          actual,
+          `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"meta":{}}],"lang":"json","meta":{}}`,
+        );
+      });
+
+      test("single gutter decoration, quad backticks", () => {
+        const text = `!!!json
+\`\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
+[23]
+\`\`\`\`
+\`\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
+[42]
+\`\`\`\`
 !!!`;
         const actual = marked.parse(text);
         assert.strictEqual(
