@@ -89,6 +89,7 @@
       // Time to parse some markdown...
       const markdown = await fetch("./index.md").then((res) => res.text());
       document.body.innerHTML += marked.parse(markdown);
+      document.body.innerHTML += `<p>Source:</p><pre>${markdown}</pre>`;
     </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-# Demo: [Code.Movie](https://code.movie/) + [Marked](https://marked.js.org/)
+# Demo: [Code.Movie](https://code.movie/) + [markdown-it](https://github.com/markdown-it/markdown-it)
 
 This is an example of a _static highlight_ in action:
 

@@ -13,8 +13,8 @@
   </head>
   <body>
     <script type="module">
-      import { marked } from "https://cdn.jsdelivr.net/npm/marked@15.0.6/lib/marked.esm.js";
-      import { markedCodeMoviePlugin } from "../../dist/marked.js";
+      import markdownIt from "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm";
+      import { markdownItCodeMoviePlugin } from "../../dist/markdown-it.js";
       import {
         fromStringToTokens,
         toHighlightHTML,
@@ -23,7 +23,7 @@
       import json from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/json.js";
       import ecmascript from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/ecmascript.js";
 
-      const codeMoviePlugin = markedCodeMoviePlugin({
+      const codeMoviePlugin = markdownItCodeMoviePlugin({
         adapter(frame, language, token) {
           return toHighlightHTML(
             fromStringToTokens(frame, { tabSize: 2, language }),
@@ -37,12 +37,12 @@
         },
       });
 
-      // Pass the plugin to Marked. Done!
-      marked.use(codeMoviePlugin);
+      // Pass the plugin to markdown-it. Done!
+      const md = markdownIt().use(codeMoviePlugin);
 
       // Time to parse some markdown...
       const markdown = await fetch("./highlight.md").then((res) => res.text());
-      document.body.innerHTML += marked.parse(markdown);
+      document.body.innerHTML += md.render(markdown);
       document.body.innerHTML += `<p>Source:</p><pre>${markdown}</pre>`;
     </script>
   </body>

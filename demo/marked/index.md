@@ -1,3 +1,7 @@
+# Demo: [Code.Movie](https://code.movie/) + [Marked](https://marked.js.org/)
+
+This is an example of a _complete animation_ in action:
+
 !!!json
 
 ```json

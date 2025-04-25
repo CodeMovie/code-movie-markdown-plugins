@@ -8,7 +8,13 @@
     "animation",
     "morph",
     "diff",
-    "code"
+    "code",
+    "plugin",
+    "marked",
+    "markedjs",
+    "marked.js",
+    "markdownit",
+    "markdown-it"
   ],
   "type": "module",
   "exports": {
@@ -21,7 +27,7 @@
   },
   "scripts": {
     "lint": "eslint ./src ./test",
-    "build": "esbuild src/marked.js src/markdown-it.js --bundle --splitting --metafile=meta.json --minify --format=esm --outdir=dist",
+    "build": "esbuild src/marked.js src/markdown-it.js --bundle --metafile=meta.json --minify --format=esm --outdir=dist",
     "dev": "esbuild src/marked.js src/markdown-it.js --bundle --metafile=meta.json --format=esm --outdir=dist --watch",
     "test:marked": "node test/index.js --marked",
     "test:markdown-it": "node test/index.js --markdown-it",
@@ -32,8 +38,8 @@
   },
   "author": "peter@peterkroener.de",
   "license": "MIT",
-  "peerDependencies": {
-    "marked": "^15.0.0"
+  "dependencies": {
+    "json5": "^2.2.3"
   },
   "devDependencies": {
     "esbuild": "^0.25.00",
@@ -41,6 +47,10 @@
     "eslint-config-prettier": "^10.0.0",
     "prettier": "^3.3.0",
     "release-it": "^19.0.0"
+  },
+  "peerDependencies": {
+    "markdown-it": "^14.1.0",
+    "marked": "^15.0.0"
   },
   "repository": {
     "type": "git",
@@ -55,8 +65,5 @@
   },
   "volta": {
     "node": "23.7.0"
-  },
-  "dependencies": {
-    "json5": "^2.2.3"
   }
 }
