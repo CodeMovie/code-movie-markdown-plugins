@@ -1,21 +1,32 @@
 import test, { suite } from "node:test";
 import assert from "node:assert";
-import { marked, Marked } from "marked";
-import { markedCodeMoviePlugin } from "../src/index.js";
+import { Marked } from "marked";
+import { markedCodeMoviePlugin } from "../src/marked.js";
 
-marked.use(
-  markedCodeMoviePlugin({
-    adapter: (frames, lang, token) =>
-      JSON.stringify({ frames, lang, meta: token.meta }),
-    languages: {
-      json: "json",
-      plaintext: "plaintext",
-    },
-  }),
-);
+const [target, parse] = process.argv.includes("--marked")
+  ? [
+      "Marked",
+      (text) => {
+        const plugin = markedCodeMoviePlugin({
+          adapter: (frames, lang, token) =>
+            JSON.stringify({ frames, lang, meta: token.meta }),
+          languages: {
+            json: "json",
+            plaintext: "plaintext",
+          },
+        });
+        return new Marked(plugin).parse(text);
+      },
+    ]
+  : [
+      "markdown-it",
+      (() => {
+        throw new Error("Not supported");
+      })(),
+    ];
 
-suite("Animations", () => {
-  suite("General plugin functionality", () => {
+suite(`${target}: Animations`, () => {
+  suite(`${target}: General plugin functionality`, () => {
     test("parsing markdown into frames - regular fenced code blocks", () => {
       const text = `!!!json
 \`\`\`
@@ -25,7 +36,7 @@ suite("Animations", () => {
 [42]
 \`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -45,7 +56,7 @@ suite("Animations", () => {
 ]
 \`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[\\n  23\\n]","decorations":[],"meta":{}},{"code":"[\\n  42\\n]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -61,7 +72,7 @@ suite("Animations", () => {
 [42]
 \`\`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -81,7 +92,7 @@ suite("Animations", () => {
 \`\`\`
 \`\`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","decorations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -97,7 +108,7 @@ suite("Animations", () => {
 [42]
 \`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -117,7 +128,7 @@ suite("Animations", () => {
 \`\`\`
 \`\`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","decorations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -140,7 +151,7 @@ suite("Animations", () => {
 !!!
 
 `;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -163,7 +174,7 @@ suite("Animations", () => {
 !!!
 
 World!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `<p>Hello!</p>\n{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}<p>World!</p>\n`,
@@ -190,7 +201,7 @@ Text
 [42]
 \`\`\`
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}<p>Text</p>
@@ -214,7 +225,7 @@ whatever
 **asdf**
 
 !!!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -222,12 +233,12 @@ whatever
     });
 
     test("handling no content", () => {
-      const actual = marked.parse("!!!json\n!!!");
+      const actual = parse("!!!json\n!!!");
       assert.strictEqual(actual, '{"frames":[],"lang":"json","meta":{}}');
     });
 
     test("handling whitespace-only content", () => {
-      const actual = marked.parse("!!!json\n  \n  \n!!!");
+      const actual = parse("!!!json\n  \n  \n!!!");
       assert.strictEqual(actual, '{"frames":[],"lang":"json","meta":{}}');
     });
 
@@ -240,7 +251,7 @@ whatever
 [42]
 \`\`\`
 !!!`;
-      assert.throws(() => marked.parse(text), Error, /not available/);
+      assert.throws(() => parse(text), Error, /not available/);
     });
 
     test("adding markup for <code-movie-runtime>", () => {
@@ -298,8 +309,8 @@ whatever
     });
   });
 
-  suite("Arguments", () => {
-    suite("On the top level wrapper", () => {
+  suite(`${target}: Arguments`, () => {
+    suite(`${target}: On the top level wrapper`, () => {
       test("Metadata", () => {
         test("parsing metadata", () => {
           const text = `!!!json(|meta={ value: 42 })
@@ -310,7 +321,7 @@ whatever
 [42]
 \`\`\`
 !!!`;
-          const actual = marked.parse(text);
+          const actual = parse(text);
           assert.strictEqual(
             actual,
             `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{"value":42}}`,
@@ -319,7 +330,7 @@ whatever
       });
     });
 
-    suite("On code blocks", () => {
+    suite(`${target}: On code blocks`, () => {
       test("empty", () => {
         const text = `!!!json
 \`\`\`()
@@ -329,7 +340,7 @@ whatever
 [42]
 \`\`\`
 !!!`;
-        const actual = marked.parse(text);
+        const actual = parse(text);
         assert.strictEqual(
           actual,
           `{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}`,
@@ -345,7 +356,7 @@ whatever
 [42]
 \`\`\`
 !!!`;
-        const actual = marked.parse(text);
+        const actual = parse(text);
         assert.strictEqual(
           actual,
           `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"meta":{}}],"lang":"json","meta":{}}`,
@@ -361,7 +372,7 @@ whatever
 [42]
 \`\`\`\`
 !!!`;
-        const actual = marked.parse(text);
+        const actual = parse(text);
         assert.strictEqual(
           actual,
           `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"meta":{}}],"lang":"json","meta":{}}`,
@@ -381,7 +392,7 @@ whatever
 [42]
 \`\`\`
 !!!`;
-        const actual = marked.parse(text);
+        const actual = parse(text);
         assert.strictEqual(
           actual,
           `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"meta":{}}],"lang":"json","meta":{}}`,
@@ -422,7 +433,7 @@ whatever
 \`\`\`
 
 !!!`;
-        const actual = marked.parse(text);
+        const actual = parse(text);
         assert.strictEqual(
           actual,
           '{"frames":[{"code":"[]","decorations":[],"meta":{"frame":0}},{"code":"[\\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}],"meta":{"frame":1}},{"code":"[\\"Hello\\", \\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"meta":{"frame":2}},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","text":"✅","line":2,"data":{}},{"kind":"GUTTER","text":"❌","line":3,"data":{}}],"meta":{"frame":3}}],"lang":"json","meta":{}}',

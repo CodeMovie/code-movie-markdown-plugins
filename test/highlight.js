@@ -1,19 +1,17 @@
 import test, { suite } from "node:test";
 import assert from "node:assert";
-import { Marked } from "marked";
-import { markedCodeMoviePlugin } from "../src/index.js";
+import { marked } from "marked";
+import { markedCodeMoviePlugin } from "../src/marked.js";
 
-const marked = new Marked();
-
-const plugin = markedCodeMoviePlugin({
-  adapter: (frame, lang, token) =>
-    JSON.stringify({ frame, lang, meta: token.meta }),
-  languages: {
-    json: "json",
-  },
-});
-
-marked.use(plugin);
+marked.use(
+  markedCodeMoviePlugin({
+    adapter: (frame, lang, token) =>
+      JSON.stringify({ frame, lang, meta: token.meta }),
+    languages: {
+      json: "json",
+    },
+  }),
+);
 
 suite("Highlighting", () => {
   suite("No breakage of existing functionality", () => {

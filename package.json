@@ -10,15 +10,22 @@
     "diff",
     "code"
   ],
-  "main": "dist/index.js",
-  "browser": "dist/index.js",
-  "module": "dist/index.js",
   "type": "module",
+  "exports": {
+    "./marked": {
+      "import": "./dist/marked.js"
+    },
+    "./markdown-it": {
+      "import": "./dist/markdown-it.js"
+    }
+  },
   "scripts": {
     "lint": "eslint ./src ./test",
-    "build": "esbuild src/index.js --bundle --metafile=meta.json --minify --format=esm --outfile=dist/index.js",
-    "dev": "esbuild src/index.js --bundle --metafile=meta.json --format=esm --outfile=dist/index.js --watch",
-    "test": "node --test",
+    "build": "esbuild src/marked.js src/markdown-it.js --bundle --splitting --metafile=meta.json --minify --format=esm --outdir=dist",
+    "dev": "esbuild src/marked.js src/markdown-it.js --bundle --metafile=meta.json --format=esm --outdir=dist --watch",
+    "test:marked": "node test/index.js --marked",
+    "test:markdown-it": "node test/index.js --markdown-it",
+    "test": "npm run test:marked && npm run test:markdown-it",
     "demo": "npm install && npm run build && npx serve",
     "prepareRelease": "npm run lint && npm run test && npm run build",
     "release": "release-it"
