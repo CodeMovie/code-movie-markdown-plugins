@@ -1,4 +1,9 @@
-import { parseArgs, parseOptions, assertLanguage } from "./lib.js";
+import {
+  parseArgs,
+  parseOptions,
+  assertLanguage,
+  wrapWithRuntime,
+} from "./lib.js";
 
 const START_HIGHLIGHT_BLOCK_RE = /^`{3}[ a-zA-Z_-]*\((?:.*?\n?)?\)/;
 const MATCH_HIGHLIGHT_BLOCK_RE =
@@ -82,16 +87,11 @@ export function markedCodeMoviePlugin(options) {
             }
             return [];
           });
-          const html = adapter(frames, languages[token.lang], token);
-          if (addRuntime) {
-            const controlsAttr =
-              typeof addRuntime === "object" && addRuntime.controls
-                ? ' controls="controls"'
-                : "";
-            const keyframesAttr = Object.keys(frames).join(" ");
-            return `<code-movie-runtime keyframes="${keyframesAttr}"${controlsAttr}>${html}</code-movie-runtime>`;
-          }
-          return html;
+          return wrapWithRuntime(
+            adapter(frames, languages[token.lang], token),
+            frames,
+            addRuntime,
+          );
         },
       },
     ],

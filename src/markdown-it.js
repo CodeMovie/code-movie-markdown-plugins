@@ -6,62 +6,82 @@ import { parseArgs, parseOptions, assertLanguage } from "./lib.js";
 const START_FRAME_BLOCK_RE =
   /^(?<mark>`{3}`?)(?<lang>[a-zA-Z_-]*) *\((?<args>.*)/;
 
+function readArgs(args, state, nextLine, endLine, pos, max) {
+  while (!args.trim().endsWith(")")) {
+    nextLine++;
+    if (nextLine >= endLine) {
+      break; // unclosed args list
+    }
+    pos = state.bMarks[nextLine] + state.tShift[nextLine];
+    max = state.eMarks[nextLine];
+    args += state.src.slice(pos, max);
+  }
+  args = args.slice(0, -1); // delete trailing ")"
+  return { pos, max, nextLine, args };
+}
+
+function matchStart(state, startLine, endLine, regExp) {
+  let pos = state.bMarks[startLine] + state.tShift[startLine];
+  let max = state.eMarks[startLine];
+  const matchStart = regExp.exec(state.src.slice(pos, max));
+
+  if (!matchStart) {
+    return false;
+  }
+
+  const { mark, lang } = matchStart.groups;
+
+  return {
+    ...readArgs(matchStart.groups.args, state, startLine, endLine, pos, max),
+    mark,
+    lang,
+  };
+}
+
+function matchEnd(mark, pos, max, state, endLine, nextLine) {
+  let hasEndMarker = false;
+  const END_RE = new RegExp(`^${mark} *$`);
+  const from = max + 1; // account for line break
+  let to = from - 1;
+
+  while (true) {
+    nextLine++;
+    if (nextLine >= endLine) {
+      break; // unclosed block
+    }
+
+    pos = state.bMarks[nextLine] + state.tShift[nextLine];
+    max = state.eMarks[nextLine];
+
+    if (END_RE.test(state.src.slice(pos, max))) {
+      to = pos - 1; // account for line break
+      hasEndMarker = true;
+      break;
+    }
+  }
+
+  return { hasEndMarker, from, to, nextLine };
+}
+
 export function markdownItCodeMoviePlugin(options) {
   const { adapter, languages, addRuntime } = parseOptions(options);
-  return function (md, name, options) {
+  return function (md) {
     function parseFrame(state, startLine, endLine, silent) {
-      let pos = state.bMarks[startLine] + state.tShift[startLine];
-      let max = state.eMarks[startLine];
+      const start = matchStart(state, startLine, endLine, START_FRAME_BLOCK_RE);
 
-      const matchStart = START_FRAME_BLOCK_RE.exec(state.src.slice(pos, max));
-
-      if (!matchStart) {
+      if (!start) {
         return false;
       }
 
-      const { mark, lang } = matchStart.groups;
-      let args = matchStart.groups.args;
-      let nextLine = startLine;
-
-      // Find end of args
-      while (!args.trim().endsWith(")")) {
-        nextLine++;
-        if (nextLine >= endLine) {
-          break; // unclosed args list
-        }
-        pos = state.bMarks[nextLine] + state.tShift[nextLine];
-        max = state.eMarks[nextLine];
-        args += state.src.slice(pos, max);
-      }
-
-      args = args.slice(0, -1); // delete trailing ")"
-
-      // Report success here in validation mode
       if (silent) {
-        return true;
+        return true; // validation mode
       }
 
-      // search end of block
-      let hasEndMarker = false;
-      const END_RE = new RegExp(`^${mark} *$`);
-      const from = max + 1; // account for line break
-      let to = from - 1;
-
-      while (true) {
-        nextLine++;
-        if (nextLine >= endLine) {
-          break; // unclosed block
-        }
-
-        pos = state.bMarks[nextLine] + state.tShift[nextLine];
-        max = state.eMarks[nextLine];
-
-        if (END_RE.test(state.src.slice(pos, max))) {
-          to = pos - 1; // account for line break
-          hasEndMarker = true;
-          break;
-        }
-      }
+      const { mark, lang, args } = start;
+      let { pos, max, nextLine } = start;
+      const end = matchEnd(mark, pos, max, state, endLine, nextLine);
+      const { hasEndMarker, from, to } = end;
+      nextLine = end.nextLine;
 
       const { meta, decorations } = parseArgs(args);
       state.line = nextLine + (hasEndMarker ? 1 : 0);
@@ -88,5 +108,12 @@ export function markdownItCodeMoviePlugin(options) {
 
     md.block.ruler.before("fence", "codeMovieFrame", parseFrame);
     md.renderer.rules["codeMovieFrame"] = renderFrame;
+
+    function parseAnimation(md) {}
+
+    function renderAnimation(tokens, idx) {}
+
+    md.block.ruler.before("fence", "codeMovieAnimation", parseAnimation);
+    md.renderer.rules["codeMovieAnimation"] = renderAnimation;
   };
 }

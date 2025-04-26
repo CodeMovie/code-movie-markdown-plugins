@@ -70,3 +70,15 @@ export function parseArgs(args, source = args) {
   }
   return { meta, decorations };
 }
+
+export function wrapWithRuntime(html, frames, configuration) {
+  if (configuration) {
+    const controlsAttr =
+      typeof configuration === "object" && configuration.controls
+        ? ' controls="controls"'
+        : "";
+    const keyframesAttr = Object.keys(frames).join(" ");
+    return `<code-movie-runtime keyframes="${keyframesAttr}"${controlsAttr}>${html}</code-movie-runtime>`;
+  }
+  return html;
+}
