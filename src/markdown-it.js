@@ -1,12 +1,23 @@
 // https://github.com/markdown-it/markdown-it/blob/master/lib/rules_block/fence.mjs
 // https://github.com/markdown-it/markdown-it-container
 
-import { parseArgs, parseOptions, assertLanguage } from "./lib.js";
+import {
+  parseArgs,
+  parseOptions,
+  assertLanguage,
+  wrapWithRuntime,
+} from "./lib.js";
 
 const START_FRAME_BLOCK_RE =
   /^(?<mark>`{3}`?)(?<lang>[a-zA-Z_-]*) *\((?<args>.*)/;
 
+const START_ANIMATION_BLOCK_RE =
+  /^(?<mark>!{3}!?)(?<lang>[a-zA-Z_-]*)(?: *\((?<args>.*))?/;
+
 function readArgs(args, state, nextLine, endLine, pos, max) {
+  if (typeof args === "undefined") {
+    return { pos, max, nextLine, args: "{}" };
+  }
   while (!args.trim().endsWith(")")) {
     nextLine++;
     if (nextLine >= endLine) {
@@ -92,7 +103,6 @@ export function markdownItCodeMoviePlugin(options) {
       token.content = state.getLines(startLine, nextLine - 1, 0, true).trim();
       token.markup = state.src.slice(from, to);
       token.map = [startLine, state.line];
-
       return true;
     }
 
@@ -109,9 +119,62 @@ export function markdownItCodeMoviePlugin(options) {
     md.block.ruler.before("fence", "codeMovieFrame", parseFrame);
     md.renderer.rules["codeMovieFrame"] = renderFrame;
 
-    function parseAnimation(md) {}
+    function parseAnimation(state, startLine, endLine, silent) {
+      const start = matchStart(
+        state,
+        startLine,
+        endLine,
+        START_ANIMATION_BLOCK_RE,
+      );
 
-    function renderAnimation(tokens, idx) {}
+      if (!start) {
+        return false;
+      }
+
+      if (silent) {
+        return true; // validation mode
+      }
+
+      const { mark, lang, args } = start;
+      let { pos, max, nextLine } = start;
+      const end = matchEnd(mark, pos, max, state, endLine, nextLine);
+      const { hasEndMarker, from, to } = end;
+      nextLine = end.nextLine;
+
+      const { meta } = parseArgs(args);
+      state.line = nextLine + (hasEndMarker ? 1 : 0);
+      const token = state.push("codeMovieAnimation", 0);
+      token.info = lang;
+      token.meta = meta;
+      token.content = state.getLines(startLine, nextLine - 1, 0, true).trim();
+      token.markup = state.src.slice(from, to);
+      token.frames = md
+        .parse(token.markup)
+        .filter(({ type }) => type === "fence" || type === "codeMovieFrame");
+      token.map = [startLine, state.line];
+      return true;
+    }
+
+    function renderAnimation(tokens, idx) {
+      const token = tokens[idx];
+      assertLanguage(token.info, languages, token);
+      const frames = token.frames.map((token) => {
+        if (token.type === "codeMovieFrame") {
+          return {
+            code: token.markup,
+            decorations: token.decorations,
+            meta: token.meta,
+          };
+        }
+        // type === 'fence'
+        return { code: token.content.trim(), decorations: [], meta: {} };
+      });
+      return wrapWithRuntime(
+        adapter(frames, languages[token.info], token),
+        frames,
+        addRuntime,
+      );
+    }
 
     md.block.ruler.before("fence", "codeMovieAnimation", parseAnimation);
     md.renderer.rules["codeMovieAnimation"] = renderAnimation;

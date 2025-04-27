@@ -1,7 +1,9 @@
 import test, { suite } from "node:test";
 import assert from "node:assert";
 import { Marked } from "marked";
+import markdownIt from "markdown-it";
 import { markedCodeMoviePlugin } from "../src/marked.js";
+import { markdownItCodeMoviePlugin } from "../src/markdown-it.js";
 
 const [target, parse] = process.argv.includes("--marked")
   ? [
@@ -20,9 +22,17 @@ const [target, parse] = process.argv.includes("--marked")
     ]
   : [
       "markdown-it",
-      (() => {
-        throw new Error("Not supported");
-      })(),
+      (text) => {
+        const plugin = markdownItCodeMoviePlugin({
+          adapter: (frames, lang, token) =>
+            JSON.stringify({ frames, lang, meta: token.meta }),
+          languages: {
+            json: "json",
+            plaintext: "plaintext",
+          },
+        });
+        return markdownIt().use(plugin).render(text);
+      },
     ];
 
 suite(`${target}: Animations`, () => {
