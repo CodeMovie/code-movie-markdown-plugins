@@ -8,7 +8,7 @@ import { markdownItCodeMoviePlugin } from "../src/markdown-it.js";
 const [target, parse] = process.argv.includes("--marked")
   ? [
       "Marked",
-      (text) => {
+      (text, config = {}) => {
         const plugin = markedCodeMoviePlugin({
           adapter: (frames, lang, token) =>
             JSON.stringify({ frames, lang, meta: token.meta }),
@@ -16,13 +16,14 @@ const [target, parse] = process.argv.includes("--marked")
             json: "json",
             plaintext: "plaintext",
           },
+          ...config,
         });
         return new Marked(plugin).parse(text);
       },
     ]
   : [
       "markdown-it",
-      (text) => {
+      (text, config = {}) => {
         const plugin = markdownItCodeMoviePlugin({
           adapter: (frames, lang, token) =>
             JSON.stringify({ frames, lang, meta: token.meta }),
@@ -30,6 +31,7 @@ const [target, parse] = process.argv.includes("--marked")
             json: "json",
             plaintext: "plaintext",
           },
+          ...config,
         });
         return markdownIt().use(plugin).render(text);
       },
@@ -265,16 +267,6 @@ whatever
     });
 
     test("adding markup for <code-movie-runtime>", () => {
-      const instance = new Marked(
-        markedCodeMoviePlugin({
-          addRuntime: true,
-          adapter: (frames, lang, token) =>
-            JSON.stringify({ frames, lang, meta: token.meta }),
-          languages: {
-            json: "json",
-          },
-        }),
-      );
       const text = `!!!json
 \`\`\`
 [23]
@@ -283,7 +275,9 @@ whatever
 [42]
 \`\`\`
 !!!`;
-      const actual = instance.parse(text);
+      const actual = parse(text, {
+        addRuntime: true,
+      });
       assert.strictEqual(
         actual,
         `<code-movie-runtime keyframes="0 1">{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}</code-movie-runtime>`,
@@ -291,18 +285,6 @@ whatever
     });
 
     test("adding markup for <code-movie-runtime> with controls", () => {
-      const instance = new Marked(
-        markedCodeMoviePlugin({
-          addRuntime: {
-            controls: true,
-          },
-          adapter: (frames, lang, token) =>
-            JSON.stringify({ frames, lang, meta: token.meta }),
-          languages: {
-            json: "json",
-          },
-        }),
-      );
       const text = `!!!json
 \`\`\`
 [23]
@@ -311,7 +293,11 @@ whatever
 [42]
 \`\`\`
 !!!`;
-      const actual = instance.parse(text);
+      const actual = parse(text, {
+        addRuntime: {
+          controls: true,
+        },
+      });
       assert.strictEqual(
         actual,
         `<code-movie-runtime keyframes="0 1" controls="controls">{"frames":[{"code":"[23]","decorations":[],"meta":{}},{"code":"[42]","decorations":[],"meta":{}}],"lang":"json","meta":{}}</code-movie-runtime>`,

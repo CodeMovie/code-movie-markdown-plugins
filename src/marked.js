@@ -3,6 +3,7 @@ import {
   parseOptions,
   assertLanguage,
   wrapWithRuntime,
+  dropLineBreaks,
 } from "./lib.js";
 
 const START_HIGHLIGHT_BLOCK_RE = /^`{3}[ a-zA-Z_-]*\((?:.*?\n?)?\)/;
@@ -35,7 +36,7 @@ export function markedCodeMoviePlugin(options) {
           return {
             type: "codeMovieHighlight",
             raw: match[0],
-            code: content.trim(),
+            code: dropLineBreaks(content),
             decorations,
             lang,
             meta,

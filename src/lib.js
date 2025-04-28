@@ -1,5 +1,15 @@
 import JSON5 from "json5";
 
+export function dropLineBreaks(string) {
+  if (string.startsWith("\n")) {
+    string = string.slice(1);
+  }
+  if (string.endsWith("\n")) {
+    string = string.slice(0, -1);
+  }
+  return string;
+}
+
 export function assertLanguage(language, languages, cause) {
   if (!(language in languages)) {
     throw new Error(

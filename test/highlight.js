@@ -166,7 +166,7 @@ More content!`;
       const actual = parse("```json()\n  \n  \n```");
       assert.strictEqual(
         actual,
-        '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
+        '{"frame":{"code":"  \\n  ","decorations":[]},"lang":"json","meta":{}}',
       );
     });
 
