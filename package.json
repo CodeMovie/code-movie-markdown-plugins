@@ -54,12 +54,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CodeMovie/code-movie-marked-plugin.git"
+    "url": "git+https://github.com/CodeMovie/code-movie-markdown-plugins.git"
   },
   "bugs": {
-    "url": "https://github.com/CodeMovie/code-movie-marked-plugin/issues"
+    "url": "https://github.com/CodeMovie/code-movie-markdown-plugins/issues"
   },
-  "homepage": "https://github.com/CodeMovie/code-movie-marked-plugin#readme",
+  "homepage": "https://github.com/CodeMovie/code-movie-markdown-plugins#readme",
   "publishConfig": {
     "access": "public"
   },

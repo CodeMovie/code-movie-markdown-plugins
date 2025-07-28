@@ -31,7 +31,7 @@ plugins extends markdown with a wrapper syntax for fenced code blocks:
 Combined with a moderate amount of plugin configuration the above turns into
 animated, syntax highlighted code when rendered to HTML:
 
-![animated code sample](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo.gif)
+![animated code sample](https://raw.githubusercontent.com/CodeMovie/code-movie-markdown-plugins/main/demo.gif)
 
 ## Installation
 
@@ -357,7 +357,7 @@ optional and default to empty objects.
 
 Resulting animation:
 
-![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
+![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-markdown-plugins/main/demo2.gif)
 
 ### Language
 
