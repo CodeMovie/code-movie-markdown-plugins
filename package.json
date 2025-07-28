@@ -1,7 +1,7 @@
 {
   "name": "@codemovie/code-movie-markdown-plugins",
   "version": "1.1.1",
-  "description": "Code.Movie plugin for Marked",
+  "description": "Code.Movie plugin for Marked and markdown-it",
   "keywords": [
     "highlight",
     "syntax",
