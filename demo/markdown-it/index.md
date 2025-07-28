@@ -1,17 +1,21 @@
+# Demo: [Code.Movie](https://code.movie/) + [markdown-it](https://github.com/markdown-it/markdown-it)
+
+This is an example of a _complete animation_ in action:
+
 !!!json
 
-```json
+```
 []
 ```
 
-```json (
+``` (
   |meta={ info: "Frame 1" }
   |decorations=[{ kind: "TEXT", from: 1, to: 8 }]
 )
 ["World"]
 ```
 
-```json (
+``` (
   |meta={ info: "Frame 2" }
   |decorations=[
     { kind: "TEXT", from: 1, to: 8 },
@@ -21,7 +25,7 @@
 ["Hello", "World"]
 ```
 
-```json (
+``` (
   |meta={ info: "Frame 3" }
   |decorations=[
     { kind: "GUTTER", text: "✅", line: 2 },

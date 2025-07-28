@@ -1,22 +1,42 @@
 import test, { suite } from "node:test";
 import assert from "node:assert";
 import { Marked } from "marked";
-import { markedCodeMoviePlugin } from "../src/index.js";
+import markdownIt from "markdown-it";
+import { markedCodeMoviePlugin } from "../src/marked.js";
+import { markdownItCodeMoviePlugin } from "../src/markdown-it.js";
 
-const marked = new Marked();
+const [target, parse] = process.argv.includes("--marked")
+  ? [
+      "Marked",
+      (text) => {
+        const plugin = markedCodeMoviePlugin({
+          adapter: (frame, lang, token) =>
+            JSON.stringify({ frame, lang, meta: token.meta }),
+          languages: {
+            json: "json",
+            plaintext: "plaintext",
+          },
+        });
+        return new Marked(plugin).parse(text);
+      },
+    ]
+  : [
+      "markdown-it",
+      (text) => {
+        const plugin = markdownItCodeMoviePlugin({
+          adapter: (frame, lang, token) =>
+            JSON.stringify({ frame, lang, meta: token.meta }),
+          languages: {
+            json: "json",
+            plaintext: "plaintext",
+          },
+        });
+        return markdownIt().use(plugin).render(text);
+      },
+    ];
 
-const plugin = markedCodeMoviePlugin({
-  adapter: (frame, lang, token) =>
-    JSON.stringify({ frame, lang, meta: token.meta }),
-  languages: {
-    json: "json",
-  },
-});
-
-marked.use(plugin);
-
-suite("Highlighting", () => {
-  suite("No breakage of existing functionality", () => {
+suite(`${target}: Highlighting`, () => {
+  suite(`${target}: No breakage of existing functionality`, () => {
     test("regular code blocks keep working", () => {
       const text = `\`\`\`json
 [
@@ -24,7 +44,7 @@ suite("Highlighting", () => {
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `<pre><code class="language-json">[
@@ -43,7 +63,7 @@ suite("Highlighting", () => {
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `<pre><code>[
@@ -56,7 +76,7 @@ suite("Highlighting", () => {
     });
   });
 
-  suite("General plugin functionality", () => {
+  suite(`${target}: General plugin functionality`, () => {
     test("parsing markdown into a frame", () => {
       const text = `\`\`\`json()
 [
@@ -64,7 +84,7 @@ suite("Highlighting", () => {
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}`,
@@ -82,7 +102,7 @@ suite("Highlighting", () => {
 \`\`\`
 
 `;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}`,
@@ -100,7 +120,7 @@ suite("Highlighting", () => {
 \`\`\`
 
 World!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `<p>Hello!</p>
@@ -125,7 +145,7 @@ World!
 \`\`\`
 
 More content!`;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `<p>Hello!</p>
@@ -135,7 +155,7 @@ More content!`;
     });
 
     test("handling no content", () => {
-      const actual = marked.parse("```json()\n```");
+      const actual = parse("```json()\n```");
       assert.strictEqual(
         actual,
         '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
@@ -143,10 +163,10 @@ More content!`;
     });
 
     test("handling whitespace-only content", () => {
-      const actual = marked.parse("```json()\n  \n  \n```");
+      const actual = parse("```json()\n  \n  \n```");
       assert.strictEqual(
         actual,
-        '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
+        '{"frame":{"code":"  \\n  ","decorations":[]},"lang":"json","meta":{}}',
       );
     });
 
@@ -157,7 +177,7 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      assert.throws(() => marked.parse(text), Error, /not available/);
+      assert.throws(() => parse(text), Error, /not available/);
     });
 
     test("error on missing language (with parens)", () => {
@@ -167,11 +187,11 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      assert.throws(() => marked.parse(text), Error, /not available/);
+      assert.throws(() => parse(text), Error, /not available/);
     });
   });
 
-  suite("Arguments", () => {
+  suite(`${target}: Arguments`, () => {
     test("handing metadata", () => {
       const text = `\`\`\`json(|meta={ test: 42 })
 [
@@ -179,7 +199,7 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{"test":42}}`,
@@ -195,7 +215,7 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{"test":42}}`,
@@ -209,7 +229,7 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}]},"lang":"json","meta":{}}`,
@@ -226,7 +246,7 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}]},"lang":"json","meta":{}}`,
@@ -248,7 +268,7 @@ More content!`;
   "World"
 ]
 \`\`\``;
-      const actual = marked.parse(text);
+      const actual = parse(text);
       assert.strictEqual(
         actual,
         `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}]},"lang":"json","meta":{"value":42}}`,

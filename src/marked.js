@@ -1,4 +1,10 @@
-import JSON5 from "json5";
+import {
+  parseArgs,
+  parseOptions,
+  assertLanguage,
+  wrapWithRuntime,
+  dropLineBreaks,
+} from "./lib.js";
 
 const START_HIGHLIGHT_BLOCK_RE = /^`{3}[ a-zA-Z_-]*\((?:.*?\n?)?\)/;
 const MATCH_HIGHLIGHT_BLOCK_RE =
@@ -11,44 +17,8 @@ const MATCH_ANIMATE_BLOCK_RE =
 // MATCH_ANIMATE_BLOCK_RE differs from MATCH_HIGHLIGHT_BLOCK_RE in that it
 // starts and ends with exclamation points and has an optional args list
 
-function parseArgs(args, source) {
-  let meta = {};
-  let decorations = [];
-  const metaMatch = /(^|\|)meta=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
-  if (metaMatch) {
-    try {
-      meta = JSON5.parse(metaMatch.groups.data) || {};
-    } catch (error) {
-      throw new SyntaxError("Unable to parse JSON5 for argument '|meta':", {
-        cause: { error, json5: metaMatch.groups.data, source },
-      });
-    }
-  }
-  const decoMatch = /(^|\|)decorations=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
-  if (decoMatch) {
-    try {
-      let parsed = JSON5.parse(decoMatch.groups.data);
-      if (!Array.isArray(parsed)) {
-        parsed = [parsed];
-      }
-      decorations = parsed.flatMap((decoration) => {
-        if (["GUTTER", "LINE", "TEXT"].includes(decoration.kind)) {
-          decoration.data ??= {};
-          return [decoration];
-        }
-        return [];
-      });
-    } catch (error) {
-      throw new SyntaxError(
-        "Unable to parse JSON5 for argument '|decorations':",
-        { cause: { error, json5: metaMatch.groups.data, source } },
-      );
-    }
-  }
-  return { meta, decorations };
-}
-
-export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
+export function markedCodeMoviePlugin(options) {
+  const { adapter, languages, addRuntime } = parseOptions(options);
   return {
     extensions: [
       // Highlighting extension, also used as a building block of animations
@@ -66,19 +36,14 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
           return {
             type: "codeMovieHighlight",
             raw: match[0],
-            code: content.trim(),
+            code: dropLineBreaks(content),
             decorations,
             lang,
             meta,
           };
         },
         renderer(token) {
-          if (!(token.lang in languages)) {
-            throw new Error(
-              `Highlighting failed: language '${token.lang}' not available`,
-              { cause: token },
-            );
-          }
+          assertLanguage(token.lang, languages, token);
           return adapter(
             { code: token.code, decorations: token.decorations },
             languages[token.lang],
@@ -107,12 +72,7 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
           };
         },
         renderer(token) {
-          if (!(token.lang in languages)) {
-            throw new Error(
-              `Animating failed: language '${token.lang}' not available`,
-              { cause: token },
-            );
-          }
+          assertLanguage(token.lang, languages, token);
           const frames = token.tokens.flatMap((token) => {
             if (token.type === "codeMovieHighlight") {
               return [
@@ -128,16 +88,11 @@ export function markedCodeMoviePlugin({ adapter, languages, addRuntime }) {
             }
             return [];
           });
-          const html = adapter(frames, languages[token.lang], token);
-          if (addRuntime) {
-            const controlsAttr =
-              typeof addRuntime === "object" && addRuntime.controls
-                ? ' controls="controls"'
-                : "";
-            const keyframesAttr = Object.keys(frames).join(" ");
-            return `<code-movie-runtime keyframes="${keyframesAttr}"${controlsAttr}>${html}</code-movie-runtime>`;
-          }
-          return html;
+          return wrapWithRuntime(
+            adapter(frames, languages[token.lang], token),
+            frames,
+            addRuntime,
+          );
         },
       },
     ],

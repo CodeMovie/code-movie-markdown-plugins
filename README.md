@@ -1,7 +1,9 @@
-# [Code.Movie](https://code.movie) plugin for [Marked](https://marked.js.org/)
+# [Code.Movie](https://code.movie) plugins for Markdown
 
-Author animated code examples with markdown! This plugin extends markdown with a
-wrapper syntax for fenced code blocks:
+**Author animated code examples with markdown!** Supports
+[Marked](https://marked.js.org/) and
+[markdown-it](https://github.com/markdown-it/markdown-it). This collection of
+plugins extends markdown with a wrapper syntax for fenced code blocks:
 
     !!!json
 
@@ -27,15 +29,15 @@ wrapper syntax for fenced code blocks:
     !!!
 
 Combined with a moderate amount of plugin configuration the above turns into
-animated, syntax highlighted code:
+animated, syntax highlighted code when rendered to HTML:
 
 ![animated code sample](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo.gif)
 
 ## Installation
 
-You can install the library as `@codemovie/code-movie-marked-plugin` from NPM,
-[download the latest release from GitHub](https://github.com/CodeMovie/code-movie-marked-plugin/releases)
-or just grab `index.js` [from the source code](https://github.com/CodeMovie/code-movie-marked-plugin/tree/main/dist).
+You can install the library as `@codemovie/code-movie-markdown-plugins` from NPM,
+[download the latest release from GitHub](https://github.com/CodeMovie/code-movie-markdown-plugins/releases)
+or just grab the matching plugin file [from the source code](https://github.com/CodeMovie/code-movie-markdown-plugins/tree/main/dist).
 
 ## Demo
 
@@ -45,15 +47,26 @@ comments.
 
 ## Setup
 
-**This plugin does _not_ bundle the core library!** You have to either manually
-install [@codemovie/code-movie](https://www.npmjs.com/package/@codemovie/code-movie)
-or load the relevant files from a CDN like [jsDelivr](https://www.jsdelivr.com/)
-as shown below:
+All plugins in this package work the same, support the same syntax and have an
+identical setup procedure.
+
+<!-- prettier-ignore -->
+> [!IMPORTANT]
+> **This package does _not_ bundle the Code.Movie core library!** You have to either manually install [@codemovie/code-movie](https://www.npmjs.com/package/@codemovie/code-movie) or load the relevant files from a CDN like [jsDelivr](https://www.jsdelivr.com/) as shown in the examples below.
+
+Plugin setup entails loading your markdown library of choice and then writing a
+very simple wrapper function to connect Code.Movie to the plugin.
+
+### Setup for [Marked](https://marked.js.org/)
+
+Apart from importing the plugin and calling the markdown library in the adapter,
+the setup is virtually identical for Marked and markdown-it. The code below
+shows the setup for Marked:
 
 ```javascript
 // Import Marked and the plugin
 import { marked } from "https://cdn.jsdelivr.net/npm/marked@15.0.6/lib/marked.esm.js";
-import { markedCodeMoviePlugin } from "./plugin/code-movie-marked-plugin/index.js";
+import { markedCodeMoviePlugin } from "@codemovie/code-movie-markdown-plugins/marked";
 // For flexibility reasons, the plugin does not ship with the main library.
 // You need to load the required functions, themes and language modules from
 // somewhere, either a CDN as shown below or from your local installation of
@@ -65,15 +78,15 @@ import {
 import json from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/json.js";
 import ecmascript from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/ecmascript.js";
 
-// The plugin can automatically add markup for <code-movie-runtime> custom
+// The plugins can automatically add markup for <code-movie-runtime> custom
 // elements, but this too requires the module for the element to be loaded
 import "https://cdn.jsdelivr.net/npm/@codemovie/code-movie-runtime";
 
 // Set the options for the plugin
 const codeMoviePlugin = markedCodeMoviePlugin({
-  // Because the core library is not bundled with the plugin, you need to
+  // Because the core library is not bundled with the plugins, you need to
   // provide an adapter function. The adapter function is called with the array
-  // of frame objects, the relevant language object, and the Marked token for
+  // of frame objects, the relevant language object, and the markdown token for
   // the animation. You can pass the first two arguments on to your particular
   // version of the core library. The token might be interesting if you want to
   // run `animateHTML()` with different arguments depending on metadata present
@@ -119,7 +132,7 @@ const codeMoviePlugin = markedCodeMoviePlugin({
   },
 });
 
-// Pass the plugin to Marked. Done!
+// Pass the plugin to the markdown library, in this case Marked. Done!
 marked.use(codeMoviePlugin);
 
 // Time to parse some markdown...
@@ -127,13 +140,106 @@ const markdown = await fetch("./content.md").then((res) => res.text());
 document.body.innerHTML += marked.parse(markdown);
 ```
 
+### Setup for [markdown-it](https://github.com/markdown-it/markdown-it)
+
+The setup for marked-it matches the setup for marked with very few (and obvious)
+differences:
+
+1. Instead of Marked, import markdown-it as the core library
+2. Instead of a Marked token, the adapter function receives a marked-it token as its third argument
+3. Instead of calling (and passing the plugin to) Marked, use marked-it's API
+
+Everything else is _exactly_ identical.
+
+<details>
+  <summary>Show full example anyway</summary>
+
+```javascript
+// Import markdown-it and the plugin
+import markdownIt from "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm";
+import { markdownItCodeMoviePlugin } from "@codemovie/code-movie-markdown-plugins/markdown-it";
+// For flexibility reasons, the plugin does not ship with the main library.
+// You need to load the required functions, themes and language modules from
+// somewhere, either a CDN as shown below or from your local installation of
+// @codemovie/code-movie.
+import {
+  animateHTML,
+  monokaiDark,
+} from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/index.js";
+import json from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/json.js";
+import ecmascript from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/ecmascript.js";
+
+// The plugins can automatically add markup for <code-movie-runtime> custom
+// elements, but this too requires the module for the element to be loaded
+import "https://cdn.jsdelivr.net/npm/@codemovie/code-movie-runtime";
+
+// Set the options for the plugin
+const codeMoviePlugin = markdownItCodeMoviePlugin({
+  // Because the core library is not bundled with the plugins, you need to
+  // provide an adapter function. The adapter function is called with the array
+  // of frame objects, the relevant language object, and the markdown token for
+  // the animation. You can pass the first two arguments on to your particular
+  // version of the core library. The token might be interesting if you want to
+  // run `animateHTML()` with different arguments depending on metadata present
+  // in the token. If you want to tweak the tab size, theme, or run some side
+  // effects (maybe depending on the aforementioned metadata), this is the place
+  // to do that. You can also add extra HTML before, after, or around the
+  // output... or not call `animateHTML()` at all, but rather do something else
+  // with the raw data.
+  adapter(frames, language, token) {
+    return animateHTML(frames, {
+      tabSize: 2,
+      language,
+      theme: monokaiDark,
+    });
+  },
+
+  // Because the language modules are HUGE and can be configured in a variety
+  // of ways, you may want to be selective about what you include and how you
+  // configure each language.
+  languages: {
+    // Every entry in the languages object maps a class name ("json" in this
+    // case) to a language module instance. To then create an animation for
+    // JSON, you'll need an element with the class "code-movie" (as defined in
+    // the selector option above) and also the class "json". <pre> elements
+    // inside this element (again, as defined by the selector option) will
+    // then be processed and animated als JSON.
+    json: json(),
+
+    // Here, the class "javascript" maps to the ecmascript module with types
+    // disabled, while the class "typescript" maps to the same language
+    // module, but with types enabled.
+    javascript: ecmascript({ ts: false }),
+    typescript: ecmascript({ ts: true }),
+  },
+
+  // To automatically add markup for <code-movie-runtime> custom elements, set
+  // the "addRuntime" option to something truthy. To initialize the
+  // <code-movie-runtime> tags with the "controls" attribute, pass an object
+  // with the controls property set to something truthy. If you need more
+  // customization, consider extending the adapter function.
+  addRuntime: {
+    controls: true,
+  },
+});
+
+// Pass the plugin to markdown-it. Done!
+const md = markdownIt().use(codeMoviePlugin);
+
+// Time to parse some markdown...
+const markdown = await fetch("./index.md").then((res) => res.text());
+document.body.innerHTML += md.render(markdown);
+```
+
+</details>
+
 ## Syntax
 
-The animation comprises of **a wrapper block** that, similar to fenced code
-blocks, starts and ends with `!!!`. The desired programming language comes after
-the opening trio of exclamation points. The animations keyframes are built up
-from **code blocks**. These can be either regular fenced code blocks or an
-extended variant that we will cover shortly.
+The syntax for an animation comprises of **a wrapper block** that, similar to
+fenced code blocks, starts and ends with `!!!`. The desired programming language
+comes after the opening trio of exclamation points. The animations keyframes are
+built up from **code blocks**. These can be either regular fenced code blocks or
+an extended variant that we will cover shortly.
 
 The most basic example therefore looks as follows:
 
@@ -176,11 +282,11 @@ Example:
 
     !!!
 
-Data from `|meta` can be used as `token.meta` in the adapter function, while
+Data from `|meta` can be accessed as `token.meta` in the adapter function, while
 `|decorations` is specifically for
 [Decorations](https://code.movie/docs/guides/decorations.html). Both types of
 arguments are explained in more detail below. The arguments lists can contain
-whitespace
+whitespace.
 
 ### Metadata: `|meta`
 
@@ -204,7 +310,7 @@ The object can contain line breaks.
 
 #### `|meta` on wrapper blocks
 
-Metadata on wrapper blocks has no immediate effect, but is is available as
+Metadata on wrapper blocks has no immediate effect, but is available as
 `token.meta` in the adapter function. You could use to control markup creation
 (to eg. allow ad-hoc addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
 or switch [themes](https://code.movie/docs/reference/themes.html) entirely.
@@ -249,7 +355,7 @@ optional and default to empty objects.
 
     !!!
 
-Neither the decoration objects nor the containing array can currently contain line breaks.
+Resulting animation:
 
 ![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-marked-plugin/main/demo2.gif)
 
