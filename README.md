@@ -174,7 +174,7 @@ import ecmascript from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/
 import "https://cdn.jsdelivr.net/npm/@codemovie/code-movie-runtime";
 
 // Set the options for the plugin
-const codeMoviePlugin = markedCodeMoviePlugin({
+const codeMoviePlugin = markdownItCodeMoviePlugin({
   // Because the core library is not bundled with the plugins, you need to
   // provide an adapter function. The adapter function is called with the array
   // of frame objects, the relevant language object, and the markdown token for
