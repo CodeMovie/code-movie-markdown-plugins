@@ -87,7 +87,7 @@ suite(`${target}: Highlighting`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{}}`,
       );
     });
 
@@ -105,7 +105,7 @@ suite(`${target}: Highlighting`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{}}`,
       );
     });
 
@@ -124,7 +124,7 @@ World!`;
       assert.strictEqual(
         actual,
         `<p>Hello!</p>
-{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}<p>World!</p>\n`,
+{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{}}<p>World!</p>\n`,
       );
     });
 
@@ -149,8 +149,8 @@ More content!`;
       assert.strictEqual(
         actual,
         `<p>Hello!</p>
-{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{}}<p>World!</p>
-{"frame":{"code":"[1, 2, 3]","decorations":[]},"lang":"json","meta":{}}<p>More content!</p>\n`,
+{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{}}<p>World!</p>
+{"frame":{"code":"[1, 2, 3]","decorations":[],"annotations":[]},"lang":"json","meta":{}}<p>More content!</p>\n`,
       );
     });
 
@@ -158,7 +158,7 @@ More content!`;
       const actual = parse("```json()\n```");
       assert.strictEqual(
         actual,
-        '{"frame":{"code":"","decorations":[]},"lang":"json","meta":{}}',
+        '{"frame":{"code":"","decorations":[],"annotations":[]},"lang":"json","meta":{}}',
       );
     });
 
@@ -166,7 +166,7 @@ More content!`;
       const actual = parse("```json()\n  \n  \n```");
       assert.strictEqual(
         actual,
-        '{"frame":{"code":"  \\n  ","decorations":[]},"lang":"json","meta":{}}',
+        '{"frame":{"code":"  \\n  ","decorations":[],"annotations":[]},"lang":"json","meta":{}}',
       );
     });
 
@@ -202,7 +202,7 @@ More content!`;
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{"test":42}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{"test":42}}`,
       );
     });
 
@@ -218,7 +218,7 @@ More content!`;
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[]},"lang":"json","meta":{"test":42}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{"test":42}}`,
       );
     });
 
@@ -232,7 +232,7 @@ More content!`;
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}]},"lang":"json","meta":{}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[]},"lang":"json","meta":{}}`,
       );
     });
 
@@ -249,7 +249,7 @@ More content!`;
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}]},"lang":"json","meta":{}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"annotations":[]},"lang":"json","meta":{}}`,
       );
     });
 
@@ -271,7 +271,7 @@ More content!`;
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}]},"lang":"json","meta":{"value":42}}`,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"annotations":[]},"lang":"json","meta":{"value":42}}`,
       );
     });
   });

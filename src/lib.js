@@ -47,6 +47,7 @@ export function parseOptions(options) {
 export function parseArgs(args, source = args) {
   let meta = {};
   let decorations = [];
+  let annotations = [];
   const metaMatch = /(^|\|)meta=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
   if (metaMatch) {
     try {
@@ -78,7 +79,28 @@ export function parseArgs(args, source = args) {
       );
     }
   }
-  return { meta, decorations };
+  const annoMatch = /(^|\|)annotations=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
+  if (annoMatch) {
+    try {
+      let parsed = JSON5.parse(annoMatch.groups.data);
+      if (!Array.isArray(parsed)) {
+        parsed = [parsed];
+      }
+      annotations = parsed.flatMap((annotation) => {
+        if (annotation.kind === "INLAY") {
+          annotation.data ??= {};
+          return [annotation];
+        }
+        return [];
+      });
+    } catch (error) {
+      throw new SyntaxError(
+        "Unable to parse JSON5 for argument '|annotation':",
+        { cause: { error, json5: metaMatch.groups.data, source } },
+      );
+    }
+  }
+  return { meta, decorations, annotations };
 }
 
 export function wrapWithRuntime(html, frames, configuration) {

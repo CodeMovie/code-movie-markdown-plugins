@@ -32,12 +32,13 @@ export function markedCodeMoviePlugin(options) {
             return;
           }
           const { content, lang, args = "" } = match.groups;
-          const { meta, decorations } = parseArgs(args, match[0]);
+          const { meta, decorations, annotations } = parseArgs(args, match[0]);
           return {
             type: "codeMovieHighlight",
             raw: match[0],
             code: dropLineBreaks(content),
             decorations,
+            annotations,
             lang,
             meta,
           };
@@ -45,7 +46,11 @@ export function markedCodeMoviePlugin(options) {
         renderer(token) {
           assertLanguage(token.lang, languages, token);
           return adapter(
-            { code: token.code, decorations: token.decorations },
+            {
+              code: token.code,
+              decorations: token.decorations,
+              annotations: token.annotations,
+            },
             languages[token.lang],
             token,
           );
@@ -79,12 +84,20 @@ export function markedCodeMoviePlugin(options) {
                 {
                   code: token.code,
                   decorations: token.decorations,
+                  annotations: token.annotations,
                   meta: token.meta,
                 },
               ];
             }
             if (token.type === "code") {
-              return [{ code: token.text, decorations: [], meta: {} }];
+              return [
+                {
+                  code: token.text,
+                  decorations: [],
+                  annotations: [],
+                  meta: {},
+                },
+              ];
             }
             return [];
           });

@@ -94,12 +94,13 @@ export function markdownItCodeMoviePlugin(options) {
       const { hasEndMarker, from, to } = end;
       nextLine = end.nextLine;
 
-      const { meta, decorations } = parseArgs(args);
+      const { meta, decorations, annotations } = parseArgs(args);
       state.line = nextLine + (hasEndMarker ? 1 : 0);
       const token = state.push("codeMovieFrame", 0);
       token.info = lang;
       token.meta = meta;
       token.decorations = decorations;
+      token.annotations = annotations;
       token.content = state.getLines(startLine, nextLine - 1, 0, true).trim();
       token.markup = state.src.slice(from, to);
       token.map = [startLine, state.line];
@@ -110,7 +111,11 @@ export function markdownItCodeMoviePlugin(options) {
       const token = tokens[idx];
       assertLanguage(token.info, languages, token);
       return adapter(
-        { code: token.markup, decorations: token.decorations },
+        {
+          code: token.markup,
+          decorations: token.decorations,
+          annotations: token.annotations,
+        },
         languages[token.info],
         token,
       );
@@ -163,11 +168,17 @@ export function markdownItCodeMoviePlugin(options) {
           return {
             code: token.markup,
             decorations: token.decorations,
+            annotations: token.annotations,
             meta: token.meta,
           };
         }
         // type === 'fence'
-        return { code: token.content.trim(), decorations: [], meta: {} };
+        return {
+          code: token.content.trim(),
+          decorations: [],
+          annotations: [],
+          meta: {},
+        };
       });
       return wrapWithRuntime(
         adapter(frames, languages[token.info], token),
