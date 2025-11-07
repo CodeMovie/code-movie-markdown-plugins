@@ -43,14 +43,12 @@
   },
   "devDependencies": {
     "esbuild": "^0.25.00",
-    "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.0.0",
+    "eslint": "^9.0.0",
+    "markdown-it": "^14.1.0",
+    "marked": "^16.0.0",
     "prettier": "^3.3.0",
     "release-it": "^19.0.0"
-  },
-  "peerDependencies": {
-    "markdown-it": "^14.1.0",
-    "marked": "^16.0.0"
   },
   "repository": {
     "type": "git",
