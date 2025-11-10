@@ -254,7 +254,7 @@ whatever
       assert.strictEqual(actual, '{"frames":[],"lang":"json","meta":{}}');
     });
 
-    test("error on unavailable language", () => {
+    test("error on unavailable language by default", () => {
       const text = `!!!something
 \`\`\`
 [23]
@@ -264,6 +264,38 @@ whatever
 \`\`\`
 !!!`;
       assert.throws(() => parse(text), Error, /not available/);
+    });
+
+    test("custom unavailable language handling", (t) => {
+      const options = {
+        missingLanguage(language, languages) {
+          return languages.plaintext;
+        },
+      };
+      t.mock.method(options, "missingLanguage");
+      const actual = parse(
+        `!!!something
+\`\`\`
+[23]
+\`\`\`
+\`\`\`
+[42]
+\`\`\`
+!!!`,
+        options,
+      );
+      assert.strictEqual(
+        actual,
+        '{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"plaintext","meta":{}}',
+      );
+      assert.strictEqual(options.missingLanguage.mock.callCount(), 1);
+      const call = options.missingLanguage.mock.calls[0];
+      assert.strictEqual(call.arguments[0], "something");
+      assert.deepStrictEqual(call.arguments[1], {
+        json: "json",
+        plaintext: "plaintext",
+      });
+      assert.deepEqual(typeof call.arguments[2], "object");
     });
 
     test("adding markup for <code-movie-runtime>", () => {

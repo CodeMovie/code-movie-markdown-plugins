@@ -172,7 +172,7 @@ More content!`;
       );
     });
 
-    test("error on unavailable language", () => {
+    test("error on unavailable language by default", () => {
       const text = `\`\`\`foobar()
 [
   "Hello",
@@ -180,6 +180,36 @@ More content!`;
 ]
 \`\`\``;
       assert.throws(() => parse(text), Error, /not available/);
+    });
+
+    test("custom unavailable language handling", (t) => {
+      const options = {
+        missingLanguage(language, languages) {
+          return languages.plaintext;
+        },
+      };
+      t.mock.method(options, "missingLanguage");
+      const actual = parse(
+        `\`\`\`foobar()
+[
+  "Hello",
+  "World"
+]
+\`\`\``,
+        options,
+      );
+      assert.strictEqual(
+        actual,
+        '{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"plaintext","meta":{}}',
+      );
+      assert.strictEqual(options.missingLanguage.mock.callCount(), 1);
+      const call = options.missingLanguage.mock.calls[0];
+      assert.strictEqual(call.arguments[0], "foobar");
+      assert.deepStrictEqual(call.arguments[1], {
+        json: "json",
+        plaintext: "plaintext",
+      });
+      assert.deepEqual(typeof call.arguments[2], "object");
     });
 
     test("error on missing language (with parens)", () => {

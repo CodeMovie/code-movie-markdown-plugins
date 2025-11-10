@@ -1,7 +1,7 @@
 import {
   parseArgs,
   parseOptions,
-  assertLanguage,
+  defaultMissingLanguage,
   wrapWithRuntime,
   dropLineBreaks,
 } from "./lib.js";
@@ -18,7 +18,12 @@ const MATCH_ANIMATE_BLOCK_RE =
 // starts and ends with exclamation points and has an optional args list
 
 export function markedCodeMoviePlugin(options) {
-  const { adapter, languages, addRuntime } = parseOptions(options);
+  const {
+    adapter,
+    languages,
+    addRuntime,
+    missingLanguage = defaultMissingLanguage,
+  } = parseOptions(options);
   return {
     extensions: [
       // Highlighting extension, also used as a building block of animations
@@ -44,14 +49,17 @@ export function markedCodeMoviePlugin(options) {
           };
         },
         renderer(token) {
-          assertLanguage(token.lang, languages, token);
+          const language =
+            token.lang in languages
+              ? languages[token.lang]
+              : missingLanguage(token.lang, languages, token);
           return adapter(
             {
               code: token.code,
               decorations: token.decorations,
               annotations: token.annotations,
             },
-            languages[token.lang],
+            language,
             token,
           );
         },
@@ -77,7 +85,10 @@ export function markedCodeMoviePlugin(options) {
           };
         },
         renderer(token) {
-          assertLanguage(token.lang, languages, token);
+          const language =
+            token.lang in languages
+              ? languages[token.lang]
+              : missingLanguage(token.lang, languages, token);
           const frames = token.tokens.flatMap((token) => {
             if (token.type === "codeMovieHighlight") {
               return [
@@ -102,7 +113,7 @@ export function markedCodeMoviePlugin(options) {
             return [];
           });
           return wrapWithRuntime(
-            adapter(frames, languages[token.lang], token),
+            adapter(frames, language, token),
             frames,
             addRuntime,
           );

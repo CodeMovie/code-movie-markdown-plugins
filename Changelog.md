@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+- Feature: add `missingLanguage` option
+
 ## 2.0.0
 
 - Breaking: change argument prefix from `|` to `@`

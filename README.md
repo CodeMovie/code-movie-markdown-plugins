@@ -212,6 +212,17 @@ const codeMoviePlugin = markdownItCodeMoviePlugin({
     typescript: ecmascript({ ts: true }),
   },
 
+  // Optional custom missing language handler. This function gets called when
+  // the library attempts to parse a block of code when a language that has not
+  // been defined in the "languages" option above. It defaults to throwing an,
+  // error, but you may want it to fall back to a language that IS defined (eg.
+  // plaintext) or to pick a best guess based on the arguments. The function
+  // receives the missing language's name (language, string), the object of
+  // available languages, and the markdown token in question.
+  missingLanguage(language, languages, token) {
+    return throw new Error(`Language '${language}' not available!`);
+  },
+
   // To automatically add markup for <code-movie-runtime> custom elements, set
   // the "addRuntime" option to something truthy. To initialize the
   // <code-movie-runtime> tags with the "controls" attribute, pass an object

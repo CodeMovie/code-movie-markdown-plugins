@@ -4,7 +4,7 @@
 import {
   parseArgs,
   parseOptions,
-  assertLanguage,
+  defaultMissingLanguage,
   wrapWithRuntime,
 } from "./lib.js";
 
@@ -75,7 +75,12 @@ function matchEnd(mark, pos, max, state, endLine, nextLine) {
 }
 
 export function markdownItCodeMoviePlugin(options) {
-  const { adapter, languages, addRuntime } = parseOptions(options);
+  const {
+    adapter,
+    languages,
+    addRuntime,
+    missingLanguage = defaultMissingLanguage,
+  } = parseOptions(options);
   return function (md) {
     function parseFrame(state, startLine, endLine, silent) {
       const start = matchStart(state, startLine, endLine, START_FRAME_BLOCK_RE);
@@ -109,14 +114,17 @@ export function markdownItCodeMoviePlugin(options) {
 
     function renderFrame(tokens, idx) {
       const token = tokens[idx];
-      assertLanguage(token.info, languages, token);
+      const language =
+        token.info in languages
+          ? languages[token.info]
+          : missingLanguage(token.info, languages, token);
       return adapter(
         {
           code: token.markup,
           decorations: token.decorations,
           annotations: token.annotations,
         },
-        languages[token.info],
+        language,
         token,
       );
     }
@@ -162,7 +170,10 @@ export function markdownItCodeMoviePlugin(options) {
 
     function renderAnimation(tokens, idx) {
       const token = tokens[idx];
-      assertLanguage(token.info, languages, token);
+      const language =
+        token.info in languages
+          ? languages[token.info]
+          : missingLanguage(token.info, languages, token);
       const frames = token.frames.map((token) => {
         if (token.type === "codeMovieFrame") {
           return {
@@ -181,7 +192,7 @@ export function markdownItCodeMoviePlugin(options) {
         };
       });
       return wrapWithRuntime(
-        adapter(frames, languages[token.info], token),
+        adapter(frames, language, token),
         frames,
         addRuntime,
       );

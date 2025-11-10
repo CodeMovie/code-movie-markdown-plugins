@@ -10,13 +10,11 @@ export function dropLineBreaks(string) {
   return string;
 }
 
-export function assertLanguage(language, languages, cause) {
-  if (!(language in languages)) {
-    throw new Error(
-      `Failure in Code.Movie plugin: language '${language}' not available`,
-      { cause },
-    );
-  }
+export function defaultMissingLanguage(language, languages, token) {
+  throw new Error(
+    `Failure in Code.Movie plugin: language '${language}' not available`,
+    { cause: token },
+  );
 }
 
 const name = (x) =>
