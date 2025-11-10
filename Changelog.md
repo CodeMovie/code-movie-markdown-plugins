@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+
+- Breaking: change argument prefix from `|` to `@`
+- Document static highlighting features in Readme
+- Remove peer dependencies
+- Bump dependencies
+
 ## 1.3.0
 
 - Prepare support for inlay annotations
