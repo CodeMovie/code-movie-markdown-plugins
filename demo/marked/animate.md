@@ -1,4 +1,4 @@
-# Demo: [Code.Movie](https://code.movie/) + [markdown-it](https://github.com/markdown-it/markdown-it)
+# Animation with [Code.Movie](https://code.movie/) and [Marked](https://marked.js.org/)
 
 This is an example of a _complete animation_ in action:
 

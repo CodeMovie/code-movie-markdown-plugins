@@ -73,6 +73,7 @@ import { markedCodeMoviePlugin } from "@codemovie/code-movie-markdown-plugins/ma
 // @codemovie/code-movie.
 import {
   animateHTML,
+  highlightHTML,
   monokaiDark,
 } from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/index.js";
 import json from "https://cdn.jsdelivr.net/npm/@codemovie/code-movie/dist/languages/json.js";
@@ -85,22 +86,24 @@ import "https://cdn.jsdelivr.net/npm/@codemovie/code-movie-runtime";
 // Set the options for the plugin
 const codeMoviePlugin = markedCodeMoviePlugin({
   // Because the core library is not bundled with the plugins, you need to
-  // provide an adapter function. The adapter function is called with the array
-  // of frame objects, the relevant language object, and the markdown token for
-  // the animation. You can pass the first two arguments on to your particular
-  // version of the core library. The token might be interesting if you want to
-  // run `animateHTML()` with different arguments depending on metadata present
+  // provide an adapter function. The adapter function is called with either an
+  // array of frame objects (when animating) or a single frame object (for
+  // static highlighting), the relevant language object, and the markdown token
+  // for the animation/to-be-highlighted code. You can pass the first two
+  // arguments on to your particular version of the core library. The "token"
+  // argument might be interesting if you want to run `animateHTML()` and
+  // `highlightHTML()` with different arguments depending on metadata present
   // in the token. If you want to tweak the tab size, theme, or run some side
   // effects (maybe depending on the aforementioned metadata), this is the place
   // to do that. You can also add extra HTML before, after, or around the
-  // output... or not call `animateHTML()` at all, but rather do something else
-  // with the raw data.
+  // output... or not call any of the core functions at all, but rather do
+  // something else with the raw data.
   adapter(frames, language, token) {
-    return animateHTML(frames, {
-      tabSize: 2,
-      language,
-      theme: monokaiDark,
-    });
+    const options = { tabSize: 2, language, theme: monokaiDark };
+    if (Array.isArray(frames)) {
+      return animateHTML(frames, options);
+    }
+    return highlightHTML(frames, options);
   },
 
   // Because the language modules are HUGE and can be configured in a variety
@@ -382,3 +385,24 @@ to enable syntax highlighting in your code editor.
 ## Customization
 
 You can read up on [styling and theming in the Code.Movie documentation!](https://code.movie/docs/guides/styling.html)
+
+## Static highlighting
+
+To use Code.Movie for static syntax highlighting, use fenced code blocks with a language and an argument list. The argument list may be empty, but is required to differentiate code blocks meant for this plugin from regular fenced code blocks:
+
+    The following is a plain fenced code block and is NOT handled by this
+    plugin:
+
+    \`\`\`json
+    [ "Hello", "World"]
+    \`\`\`
+
+    The following is a plain fenced code block with and argument list and IS
+    handled by this plugin:
+
+    \`\`\`json()
+    [ "Hello", "World"]
+    \`\`\`
+
+In principle Code.Movie can highlight regular fenced code blocks too, but this
+plugin does not do this currently.
