@@ -261,7 +261,7 @@ The most basic example therefore looks as follows:
 Both the wrapper block and the code blocks can take **arguments**. These are
 pairs of keys and [JSON5-encoded values](https://www.npmjs.com/package/json5),
 wrapped in parenthesis, that pass additional information. Keys always start with
-a pipe (`|`) symbol and are always immediately followed by an equals sign (`=`).
+a `@` symbol and are always immediately followed by an equals sign (`=`).
 Currently there are two arguments available:
 
 - **`@meta=`** for both wrapper and code blocks
@@ -285,13 +285,13 @@ Example:
 
     !!!
 
-Data from `|meta` can be accessed as `token.meta` in the adapter function, while
+Data from `@meta` can be accessed as `token.meta` in the adapter function, while
 `|decorations` is specifically for
 [Decorations](https://code.movie/docs/guides/decorations.html). Both types of
 arguments are explained in more detail below. The arguments lists can contain
 whitespace.
 
-### Metadata: `|meta`
+### Metadata: `@meta`
 
 You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.com/package/json5)
 to a **wrapper block** or **code block**. The argument is always optional and
@@ -311,14 +311,14 @@ defaults to an empty object:
 
 The object can contain line breaks.
 
-#### `|meta` on wrapper blocks
+#### `@meta` on wrapper blocks
 
 Metadata on wrapper blocks has no immediate effect, but is available as
 `token.meta` in the adapter function. You could use to control markup creation
 (to eg. allow ad-hoc addition of [custom properties](https://code.movie/docs/reference/css-variables.html))
 or switch [themes](https://code.movie/docs/reference/themes.html) entirely.
 
-#### `|meta` on code blocks
+#### `@meta` on code blocks
 
 Metadata on code blocks has no immediate effect, but gets added to the `meta`
 property on the frame objects available in the adapter function.
