@@ -34,7 +34,7 @@
     "test": "npm run test:marked && npm run test:markdown-it",
     "demo": "npm install && npm run build && npx serve",
     "prepareRelease": "npm run lint && npm run test && npm run build",
-    "release": "release-it"
+    "release": "npm run prepareRelease && release-it"
   },
   "author": "peter@peterkroener.de",
   "license": "MIT",
