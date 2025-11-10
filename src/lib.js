@@ -48,17 +48,17 @@ export function parseArgs(args, source = args) {
   let meta = {};
   let decorations = [];
   let annotations = [];
-  const metaMatch = /(^|\|)meta=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
+  const metaMatch = /(^|@)meta=(?<data>.*?)($|@[a-z]+=)/s.exec(args);
   if (metaMatch) {
     try {
       meta = JSON5.parse(metaMatch.groups.data) || {};
     } catch (error) {
-      throw new SyntaxError("Unable to parse JSON5 for argument '|meta':", {
+      throw new SyntaxError("Unable to parse JSON5 for argument '@meta':", {
         cause: { error, json5: metaMatch.groups.data, source },
       });
     }
   }
-  const decoMatch = /(^|\|)decorations=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
+  const decoMatch = /(^|@)decorations=(?<data>.*?)($|@[a-z]+=)/s.exec(args);
   if (decoMatch) {
     try {
       let parsed = JSON5.parse(decoMatch.groups.data);
@@ -74,12 +74,12 @@ export function parseArgs(args, source = args) {
       });
     } catch (error) {
       throw new SyntaxError(
-        "Unable to parse JSON5 for argument '|decorations':",
+        "Unable to parse JSON5 for argument '@decorations':",
         { cause: { error, json5: metaMatch.groups.data, source } },
       );
     }
   }
-  const annoMatch = /(^|\|)annotations=(?<data>.*?)($|\|[a-z]+=)/s.exec(args);
+  const annoMatch = /(^|@)annotations=(?<data>.*?)($|@[a-z]+=)/s.exec(args);
   if (annoMatch) {
     try {
       let parsed = JSON5.parse(annoMatch.groups.data);
@@ -95,7 +95,7 @@ export function parseArgs(args, source = args) {
       });
     } catch (error) {
       throw new SyntaxError(
-        "Unable to parse JSON5 for argument '|annotation':",
+        "Unable to parse JSON5 for argument '@annotation':",
         { cause: { error, json5: metaMatch.groups.data, source } },
       );
     }

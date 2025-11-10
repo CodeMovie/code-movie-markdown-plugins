@@ -309,7 +309,7 @@ whatever
     suite(`${target}: On the top level wrapper`, () => {
       test("Metadata", () => {
         test("parsing metadata", () => {
-          const text = `!!!json(|meta={ value: 42 })
+          const text = `!!!json(@meta={ value: 42 })
 \`\`\`
 [23]
 \`\`\`
@@ -345,10 +345,10 @@ whatever
 
       test("single gutter decoration", () => {
         const text = `!!!json
-\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
+\`\`\`(@decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
 [23]
 \`\`\`
-\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
+\`\`\`(@decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
 [42]
 \`\`\`
 !!!`;
@@ -361,10 +361,10 @@ whatever
 
       test("single gutter decoration, quad backticks", () => {
         const text = `!!!json
-\`\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
+\`\`\`\`(@decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
 [23]
 \`\`\`\`
-\`\`\`\`(|decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
+\`\`\`\`(@decorations=[{ kind: "GUTTER", line: 1, text: "✅" }])
 [42]
 \`\`\`\`
 !!!`;
@@ -377,12 +377,12 @@ whatever
 
       test("multi-line gutter decoration syntax", () => {
         const text = `!!!json
-\`\`\`(|decorations=[
+\`\`\`(@decorations=[
   { kind: "GUTTER", line: 1, text: "❌" }
 ])
 [23]
 \`\`\`
-\`\`\`(|decorations=[
+\`\`\`(@decorations=[
   { kind: "GUTTER", line: 1, text: "✅" }
       ])
 [42]
@@ -398,30 +398,30 @@ whatever
       test("mixed decorations and metadata with whitespace", () => {
         const text = `!!!json
 
-\`\`\`(|meta={ frame: 0 })
+\`\`\`(@meta={ frame: 0 })
 []
 \`\`\`
 
 \`\`\`(
-  |meta={ frame: 1 }
-  |decorations=[{ kind: "TEXT", from: 1, to: 8 }]
+  @meta={ frame: 1 }
+  @decorations=[{ kind: "TEXT", from: 1, to: 8 }]
 )
 ["World"]
 \`\`\`
 
 \`\`\`(
-  |decorations=[
+  @decorations=[
     { kind: "TEXT", from: 1, to: 8 },
     { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
   ]
-  |meta={
+  @meta={
     frame: 2
   }
 )
 ["Hello", "World"]
 \`\`\`
 
-\`\`\`(|meta={ frame: 3 }|decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "❌", line: 3 }])
+\`\`\`(@meta={ frame: 3 }@decorations=[{ kind: "GUTTER", text: "✅", line: 2 }, { kind: "GUTTER", text: "❌", line: 3 }])
 [
   "Hello",
   "World"

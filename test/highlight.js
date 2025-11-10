@@ -209,7 +209,7 @@ More content!`;
 
   suite(`${target}: Arguments`, () => {
     test("handing metadata", () => {
-      const text = `\`\`\`json(|meta={ test: 42 })
+      const text = `\`\`\`json(@meta={ test: 42 })
 [
   "Hello",
   "World"
@@ -223,7 +223,7 @@ More content!`;
     });
 
     test("handing multi-line metadata", () => {
-      const text = `\`\`\`json(|meta={
+      const text = `\`\`\`json(@meta={
   test: 42
 })
 [
@@ -239,7 +239,7 @@ More content!`;
     });
 
     test("handing a single gutter decoration", () => {
-      const text = `\`\`\`json(|decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
+      const text = `\`\`\`json(@decorations=[{ kind: "GUTTER", line: 1, text: "❌" }])
 [
   "Hello",
   "World"
@@ -253,7 +253,7 @@ More content!`;
     });
 
     test("handing multiple decorations, multiline", () => {
-      const text = `\`\`\`json(|decorations=[
+      const text = `\`\`\`json(@decorations=[
   { kind: "GUTTER", line: 1, text: "❌" },
   { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
 ])
@@ -271,11 +271,11 @@ More content!`;
 
     test("handing metadata and multiple decorations with large amounts of whitespace", () => {
       const text = `\`\`\`json(
-  |decorations=[
+  @decorations=[
     { kind: "GUTTER", line: 1, text: "❌" },
     { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
   ]
-  |meta={
+  @meta={
     value: 42
   }
 )

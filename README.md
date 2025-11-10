@@ -264,19 +264,19 @@ wrapped in parenthesis, that pass additional information. Keys always start with
 a pipe (`|`) symbol and are always immediately followed by an equals sign (`=`).
 Currently there are two arguments available:
 
-- **`|meta=`** for both wrapper and code blocks
-- **`|decorations=`** for code blocks only
+- **`@meta=`** for both wrapper and code blocks
+- **`@decorations=`** for code blocks only
 
 Example:
 
-    !!!json(|meta={ value: "This is metadata for the wrapper" })
+    !!!json(@meta={ value: "This is metadata for the wrapper" })
 
-    ```(|meta={ value: "This is metadata for the first frame" })
+    ```(@meta={ value: "This is metadata for the first frame" })
     "Code block content, first keyframe"
     ```
 
     ```(
-      |meta={
+      @meta={
         value: "This is metadata for the second frame. With whitespace!"
       }
     )
@@ -297,13 +297,13 @@ You can add any metadata you like as a [JSON5-encoded object](https://www.npmjs.
 to a **wrapper block** or **code block**. The argument is always optional and
 defaults to an empty object:
 
-    !!!json(|meta={ value: "Metadata for the entire animation" })
+    !!!json(@meta={ value: "Metadata for the entire animation" })
 
-    ```(|meta={ value: "Metadata for the first frame" })
+    ```(@meta={ value: "Metadata for the first frame" })
     [23]
     ```
 
-    ```(|meta={ value: "Metadata for the second frame" })
+    ```(@meta={ value: "Metadata for the second frame" })
     [42]
     ```
 
@@ -335,18 +335,18 @@ optional and default to empty objects.
     []
     ```
 
-    ```(|decorations=[{ kind: "TEXT", from: 1, to: 8 }])
+    ```(@decorations=[{ kind: "TEXT", from: 1, to: 8 }])
     ["World"]
     ```
 
-    ```(|decorations=[
+    ```(@decorations=[
       { kind: "TEXT", from: 1, to: 8 },
       { kind: "TEXT", from: 10, to: 17, data: { class: "error" } }
     ])
     ["Hello", "World"]
     ```
 
-    ```(|decorations=[
+    ```(@decorations=[
       { kind: "GUTTER", text: "✅", line: 2 },
       { kind: "GUTTER", text: "🚫", line: 3 }
     ])
@@ -374,8 +374,8 @@ to enable syntax highlighting in your code editor.
     ```
 
     ```json (
-      |meta={ info: "Frame 1" }
-      |decorations=[{ kind: "TEXT", from: 1, to: 8 }]
+      @meta={ info: "Frame 1" }
+      @decorations=[{ kind: "TEXT", from: 1, to: 8 }]
     )
     ["Note that a space between the language and the arguments is valid!"]
     ```
