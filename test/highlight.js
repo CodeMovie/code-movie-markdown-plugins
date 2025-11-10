@@ -8,7 +8,7 @@ import { markdownItCodeMoviePlugin } from "../src/markdown-it.js";
 const [target, parse] = process.argv.includes("--marked")
   ? [
       "Marked",
-      (text) => {
+      (text, config = {}) => {
         const plugin = markedCodeMoviePlugin({
           adapter: (frame, lang, token) =>
             JSON.stringify({ frame, lang, meta: token.meta }),
@@ -16,13 +16,14 @@ const [target, parse] = process.argv.includes("--marked")
             json: "json",
             plaintext: "plaintext",
           },
+          ...config,
         });
         return new Marked(plugin).parse(text);
       },
     ]
   : [
       "markdown-it",
-      (text) => {
+      (text, config = {}) => {
         const plugin = markdownItCodeMoviePlugin({
           adapter: (frame, lang, token) =>
             JSON.stringify({ frame, lang, meta: token.meta }),
@@ -30,6 +31,7 @@ const [target, parse] = process.argv.includes("--marked")
             json: "json",
             plaintext: "plaintext",
           },
+          ...config,
         });
         return markdownIt().use(plugin).render(text);
       },
@@ -188,6 +190,20 @@ More content!`;
 ]
 \`\`\``;
       assert.throws(() => parse(text), Error, /not available/);
+    });
+
+    test("addRuntime: true does not add <code-movie-runtime> when highlighting", () => {
+      const text = `\`\`\`json()
+[
+  "Hello",
+  "World"
+]
+\`\`\``;
+      const actual = parse(text, { addRuntime: true });
+      assert.strictEqual(
+        actual,
+        `{"frame":{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[],"annotations":[]},"lang":"json","meta":{}}`,
+      );
     });
   });
 
