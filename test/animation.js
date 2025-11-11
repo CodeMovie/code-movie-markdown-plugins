@@ -339,7 +339,7 @@ whatever
 
   suite(`${target}: Arguments`, () => {
     suite(`${target}: On the top level wrapper`, () => {
-      test("Metadata", () => {
+      suite("Metadata", () => {
         test("parsing metadata", () => {
           const text = `!!!json(@meta={ value: 42 })
 \`\`\`
@@ -354,6 +354,18 @@ whatever
             actual,
             `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{"value":42}}`,
           );
+        });
+
+        test("invalid JSON5", () => {
+          const text = `!!!json(@meta=[{ value: 23 } { value: 42 }])
+\`\`\`
+[23]
+\`\`\`
+\`\`\`
+[42]
+\`\`\`
+!!!`;
+          assert.throws(() => parse(text), SyntaxError, /JSON5/);
         });
       });
     });
@@ -466,6 +478,32 @@ whatever
           actual,
           '{"frames":[{"code":"[]","decorations":[],"annotations":[],"meta":{"frame":0}},{"code":"[\\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}],"annotations":[],"meta":{"frame":1}},{"code":"[\\"Hello\\", \\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"annotations":[],"meta":{"frame":2}},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","text":"✅","line":2,"data":{}},{"kind":"GUTTER","text":"❌","line":3,"data":{}}],"annotations":[],"meta":{"frame":3}}],"lang":"json","meta":{}}',
         );
+      });
+
+      test("invalid JSON5 in decorations", () => {
+        const text = `!!!json
+
+\`\`\`(
+  @meta={ frame: 1 }
+  @decorations=[{ kind: "TEXT" from: 1, to: 8 }]
+)
+["World"]
+\`\`\`
+
+\`\`\`(
+  @decorations=[
+    { kind: "TEXT", from: 1, to: 8 },
+    { kind: "TEXT", from: 10 to: 17,, }
+  ]
+  @meta={
+    frame: 2
+  }
+)
+["Hello", "World"]
+\`\`\`
+
+!!!`;
+        assert.throws(() => parse(text), SyntaxError, /JSON5/);
       });
     });
   });
