@@ -37,11 +37,15 @@ export function markedCodeMoviePlugin(options) {
             return;
           }
           const { content, lang, args = "" } = match.groups;
-          const { meta, decorations, annotations } = parseArgs(args, match[0]);
+          const { meta, ranges, decorations, annotations } = parseArgs(
+            args,
+            match[0],
+          );
           return {
             type: "codeMovieHighlight",
             raw: match[0],
             code: dropLineBreaks(content),
+            ranges,
             decorations,
             annotations,
             lang,
@@ -56,6 +60,7 @@ export function markedCodeMoviePlugin(options) {
           return adapter(
             {
               code: token.code,
+              ranges: token.ranges,
               decorations: token.decorations,
               annotations: token.annotations,
             },
@@ -94,6 +99,7 @@ export function markedCodeMoviePlugin(options) {
               return [
                 {
                   code: token.code,
+                  ranges: token.ranges,
                   decorations: token.decorations,
                   annotations: token.annotations,
                   meta: token.meta,
@@ -104,6 +110,7 @@ export function markedCodeMoviePlugin(options) {
               return [
                 {
                   code: token.text,
+                  ranges: [],
                   decorations: [],
                   annotations: [],
                   meta: {},

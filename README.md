@@ -273,6 +273,7 @@ Currently there are two arguments available:
 
 - **`@meta=`** for both wrapper and code blocks
 - **`@decorations=`** for code blocks only
+- **`@ranges=`** for code blocks only
 
 Example:
 
@@ -293,10 +294,10 @@ Example:
     !!!
 
 Data from `@meta` can be accessed as `token.meta` in the adapter function, while
-`|decorations` is specifically for
-[Decorations](https://code.movie/docs/guides/decorations.html). Both types of
-arguments are explained in more detail below. The arguments lists can contain
-whitespace.
+`@decorations` is specifically for
+[Decorations](https://code.movie/docs/guides/decorations.html) and `@ranges` is
+specifically for **Ranges**. All types of arguments are explained in more detail
+below. The arguments lists can contain whitespace.
 
 ### Metadata: `@meta`
 
@@ -330,7 +331,7 @@ or switch [themes](https://code.movie/docs/reference/themes.html) entirely.
 Metadata on code blocks has no immediate effect, but gets added to the `meta`
 property on the frame objects available in the adapter function.
 
-### [Decorations](https://code.movie/docs/guides/decorations.html): `|decorations`
+### [Decorations](https://code.movie/docs/guides/decorations.html): `@decorations`
 
 You can add decorations as [JSON5-encoded arrays](https://www.npmjs.com/package/json5)
 to the individual code blocks inside a `code-movie` block. The`data` fields are
@@ -368,6 +369,14 @@ optional and default to empty objects.
 Resulting animation:
 
 ![animated code sample with decorations](https://raw.githubusercontent.com/CodeMovie/code-movie-markdown-plugins/main/demo2.gif)
+
+### Ranges: `@ranges`
+
+You can add ranges as [JSON5-encoded arrays](https://www.npmjs.com/package/json5)
+to the individual code blocks inside a `code-movie` block. Read the guide on
+salting to understand how to best use ranges to take manual control of your
+animation. Like with decorations, the`data` field is optional and defaults to
+an empty object.
 
 ### Language
 

@@ -51,7 +51,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -71,7 +71,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[\\n  23\\n]","decorations":[],"annotations":[],"meta":{}},{"code":"[\\n  42\\n]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[\\n  23\\n]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[\\n  42\\n]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -87,7 +87,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -107,7 +107,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","decorations":[],"annotations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -123,7 +123,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -143,7 +143,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","decorations":[],"annotations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"\`\`\`\\n[23]\\n\`\`\`","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"\`\`\`\\n[42]\\n\`\`\`","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -166,7 +166,7 @@ suite(`${target}: Animations`, () => {
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -189,7 +189,7 @@ World!`;
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `<p>Hello!</p>\n{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}<p>World!</p>\n`,
+        `<p>Hello!</p>\n{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}<p>World!</p>\n`,
       );
     });
 
@@ -216,8 +216,8 @@ Text
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}<p>Text</p>
-{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}<p>Text</p>
+{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -240,7 +240,7 @@ whatever
       const actual = parse(text);
       assert.strictEqual(
         actual,
-        `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
       );
     });
 
@@ -286,7 +286,7 @@ whatever
       );
       assert.strictEqual(
         actual,
-        '{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"plaintext","meta":{}}',
+        '{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"plaintext","meta":{}}',
       );
       assert.strictEqual(options.missingLanguage.mock.callCount(), 1);
       const call = options.missingLanguage.mock.calls[0];
@@ -312,7 +312,7 @@ whatever
       });
       assert.strictEqual(
         actual,
-        `<code-movie-runtime keyframes="0 1">{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}</code-movie-runtime>`,
+        `<code-movie-runtime keyframes="0 1">{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}</code-movie-runtime>`,
       );
     });
 
@@ -332,7 +332,7 @@ whatever
       });
       assert.strictEqual(
         actual,
-        `<code-movie-runtime keyframes="0 1" controls="controls">{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}</code-movie-runtime>`,
+        `<code-movie-runtime keyframes="0 1" controls="controls">{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}</code-movie-runtime>`,
       );
     });
   });
@@ -352,7 +352,7 @@ whatever
           const actual = parse(text);
           assert.strictEqual(
             actual,
-            `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{"value":42}}`,
+            `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{"value":42}}`,
           );
         });
 
@@ -383,7 +383,39 @@ whatever
         const actual = parse(text);
         assert.strictEqual(
           actual,
-          `{"frames":[{"code":"[23]","decorations":[],"annotations":[],"meta":{}},{"code":"[42]","decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+          `{"frames":[{"code":"[23]","ranges":[],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+        );
+      });
+
+      test("single range", () => {
+        const text = `!!!json
+\`\`\`(@ranges=[{ from: 1, to: 2, data: {} }])
+[23]
+\`\`\`
+\`\`\`(@ranges=[{ from: 2, to: 3, data: {} }])
+[42]
+\`\`\`
+!!!`;
+        const actual = parse(text);
+        assert.strictEqual(
+          actual,
+          '{"frames":[{"code":"[23]","ranges":[{"from":1,"to":2,"data":{}}],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[{"from":2,"to":3,"data":{}}],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}',
+        );
+      });
+
+      test("multiple ranges", () => {
+        const text = `!!!json
+\`\`\`(@ranges=[{ from: 1, to: 2, data: {} }, { from: 3, to: 4, data: { foo: 1 } }])
+[23]
+\`\`\`
+\`\`\`(@ranges=[{ from: 2, to: 3, data: {} }, { from: 3, to: 4, data: { foo: 1 } }])
+[42]
+\`\`\`
+!!!`;
+        const actual = parse(text);
+        assert.strictEqual(
+          actual,
+          '{"frames":[{"code":"[23]","ranges":[{"from":1,"to":2,"data":{}},{"from":3,"to":4,"data":{"foo":1}}],"decorations":[],"annotations":[],"meta":{}},{"code":"[42]","ranges":[{"from":2,"to":3,"data":{}},{"from":3,"to":4,"data":{"foo":1}}],"decorations":[],"annotations":[],"meta":{}}],"lang":"json","meta":{}}',
         );
       });
 
@@ -399,7 +431,7 @@ whatever
         const actual = parse(text);
         assert.strictEqual(
           actual,
-          `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+          `{"frames":[{"code":"[23]","ranges":[],"decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
         );
       });
 
@@ -415,7 +447,7 @@ whatever
         const actual = parse(text);
         assert.strictEqual(
           actual,
-          `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+          `{"frames":[{"code":"[23]","ranges":[],"decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
         );
       });
 
@@ -435,7 +467,7 @@ whatever
         const actual = parse(text);
         assert.strictEqual(
           actual,
-          `{"frames":[{"code":"[23]","decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[],"meta":{}},{"code":"[42]","decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
+          `{"frames":[{"code":"[23]","ranges":[],"decorations":[{"kind":"GUTTER","line":1,"text":"❌","data":{}}],"annotations":[],"meta":{}},{"code":"[42]","ranges":[],"decorations":[{"kind":"GUTTER","line":1,"text":"✅","data":{}}],"annotations":[],"meta":{}}],"lang":"json","meta":{}}`,
         );
       });
 
@@ -476,7 +508,7 @@ whatever
         const actual = parse(text);
         assert.strictEqual(
           actual,
-          '{"frames":[{"code":"[]","decorations":[],"annotations":[],"meta":{"frame":0}},{"code":"[\\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}],"annotations":[],"meta":{"frame":1}},{"code":"[\\"Hello\\", \\"World\\"]","decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"annotations":[],"meta":{"frame":2}},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","decorations":[{"kind":"GUTTER","text":"✅","line":2,"data":{}},{"kind":"GUTTER","text":"❌","line":3,"data":{}}],"annotations":[],"meta":{"frame":3}}],"lang":"json","meta":{}}',
+          '{"frames":[{"code":"[]","ranges":[],"decorations":[],"annotations":[],"meta":{"frame":0}},{"code":"[\\"World\\"]","ranges":[],"decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}}],"annotations":[],"meta":{"frame":1}},{"code":"[\\"Hello\\", \\"World\\"]","ranges":[],"decorations":[{"kind":"TEXT","from":1,"to":8,"data":{}},{"kind":"TEXT","from":10,"to":17,"data":{"class":"error"}}],"annotations":[],"meta":{"frame":2}},{"code":"[\\n  \\"Hello\\",\\n  \\"World\\"\\n]","ranges":[],"decorations":[{"kind":"GUTTER","text":"✅","line":2,"data":{}},{"kind":"GUTTER","text":"❌","line":3,"data":{}}],"annotations":[],"meta":{"frame":3}}],"lang":"json","meta":{}}',
         );
       });
 

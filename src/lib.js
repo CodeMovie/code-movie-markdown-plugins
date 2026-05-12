@@ -44,6 +44,7 @@ export function parseOptions(options) {
 
 export function parseArgs(args, source = args) {
   let meta = {};
+  let ranges = [];
   let decorations = [];
   let annotations = [];
   const metaMatch = /(^|@)meta=(?<data>.*?)($|@[a-z]+=)/s.exec(args);
@@ -52,6 +53,25 @@ export function parseArgs(args, source = args) {
       meta = JSON5.parse(metaMatch.groups.data) || {};
     } catch (error) {
       throw new SyntaxError("Unable to parse JSON5 for argument '@meta':", {
+        cause: { error, json5: metaMatch.groups.data, source },
+      });
+    }
+  }
+  const rangeMatch = /(^|@)ranges=(?<data>.*?)($|@[a-z]+=)/s.exec(args);
+  if (rangeMatch) {
+    try {
+      let parsed = JSON5.parse(rangeMatch.groups.data);
+      if (!Array.isArray(parsed)) {
+        parsed = [parsed];
+      }
+      ranges = parsed.flatMap((range) => {
+        if (["from", "to", "data"].every((key) => key in range)) {
+          return [range];
+        }
+        return [];
+      });
+    } catch (error) {
+      throw new SyntaxError("Unable to parse JSON5 for argument '@ranges':", {
         cause: { error, json5: metaMatch.groups.data, source },
       });
     }
@@ -98,7 +118,7 @@ export function parseArgs(args, source = args) {
       );
     }
   }
-  return { meta, decorations, annotations };
+  return { meta, decorations, annotations, ranges };
 }
 
 export function wrapWithRuntime(html, frames, configuration) {

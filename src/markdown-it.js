@@ -99,11 +99,12 @@ export function markdownItCodeMoviePlugin(options) {
       const { hasEndMarker, from, to } = end;
       nextLine = end.nextLine;
 
-      const { meta, decorations, annotations } = parseArgs(args);
+      const { meta, ranges, decorations, annotations } = parseArgs(args);
       state.line = nextLine + (hasEndMarker ? 1 : 0);
       const token = state.push("codeMovieFrame", 0);
       token.info = lang;
       token.meta = meta;
+      token.ranges = ranges;
       token.decorations = decorations;
       token.annotations = annotations;
       token.content = state.getLines(startLine, nextLine - 1, 0, true).trim();
@@ -121,6 +122,7 @@ export function markdownItCodeMoviePlugin(options) {
       return adapter(
         {
           code: token.markup,
+          ranges: token.ranges,
           decorations: token.decorations,
           annotations: token.annotations,
         },
@@ -178,6 +180,7 @@ export function markdownItCodeMoviePlugin(options) {
         if (token.type === "codeMovieFrame") {
           return {
             code: token.markup,
+            ranges: token.ranges,
             decorations: token.decorations,
             annotations: token.annotations,
             meta: token.meta,
@@ -186,6 +189,7 @@ export function markdownItCodeMoviePlugin(options) {
         // type === 'fence'
         return {
           code: token.content.trim(),
+          ranges: [],
           decorations: [],
           annotations: [],
           meta: {},
