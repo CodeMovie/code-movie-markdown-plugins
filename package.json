@@ -59,7 +59,8 @@
   },
   "homepage": "https://github.com/CodeMovie/code-movie-markdown-plugins#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "volta": {
     "node": "23.7.0"
