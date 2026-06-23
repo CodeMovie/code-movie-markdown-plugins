@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.1
+
+- Maintenance release
+
 ## 2.2.0
 
 - Feature: add support for the upcoming ranges/salting feature
