@@ -293,11 +293,7 @@ Example:
 
     !!!
 
-Data from `@meta` can be accessed as `token.meta` in the adapter function, while
-`@decorations` is specifically for
-[Decorations](https://code.movie/docs/guides/decorations.html) and `@ranges` is
-specifically for **Ranges**. All types of arguments are explained in more detail
-below. The arguments lists can contain whitespace.
+Data from `@meta` can be accessed as `token.meta` in the adapter function, while `@decorations` is specifically for [Decorations](https://code.movie/docs/guides/decorations.html) and `@ranges` is specifically for [salting sections of code](https://code.movie/docs/guides/salting.html). All types of arguments are explained in more detail below. The arguments lists can contain whitespace.
 
 ### Metadata: `@meta`
 
@@ -372,11 +368,7 @@ Resulting animation:
 
 ### Ranges: `@ranges`
 
-You can add ranges as [JSON5-encoded arrays](https://www.npmjs.com/package/json5)
-to the individual code blocks inside a `code-movie` block. Read the guide on
-salting to understand how to best use ranges to take manual control of your
-animation. Like with decorations, the`data` field is optional and defaults to
-an empty object.
+You can add ranges as [JSON5-encoded arrays](https://www.npmjs.com/package/json5) to the individual code blocks inside a `code-movie` block. [Read the guide on salting to understand how to best use ranges to take manual control of your animation.](https://code.movie/docs/guides/salting.html) Like with decorations, the`data` field is optional and defaults to an empty object.
 
 ### Language
 
